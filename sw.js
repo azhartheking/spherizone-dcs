@@ -1,7 +1,7 @@
 /* Spherizone DCS simulator — service worker
    Network first: when online every page and script is fetched fresh, so users always get the newest
    published version. A copy is kept in the cache so the simulator also works offline.               */
-const CACHE = 'szdcs-151';
+const CACHE = 'szdcs-152';
 const CORE = ['./', 'index.html', 'catalyst.html', 'mzcr.html', 'flash.html', 'gpr.html', 'finishing.html', 'extrusion.html',
   'utilities.html', 'trends.html', 'alarms.html', 'quality.html', 'instructor.html', 'manual.html',
   'assets/dcs.css', 'assets/model.js', 'assets/core.js', 'assets/ui.js', 'manifest.webmanifest',
@@ -17,8 +17,10 @@ self.addEventListener('fetch', (e) => {
   const r = e.request;
   if (r.method !== 'GET' || new URL(r.url).origin !== self.location.origin) return;
   if (r.url.includes('version.json')) return;                       // always straight from the network
+  // 'no-cache' = always re-check with the server (cheap 304 when unchanged), never serve a stale copy
+  const net = r.mode === 'navigate' ? fetch(r.url, { cache: 'no-cache', credentials: 'same-origin' }) : fetch(r, { cache: 'no-cache' });
   e.respondWith(
-    fetch(r).then((res) => {
+    net.then((res) => {
       if (res && res.ok) { const cp = res.clone(); caches.open(CACHE).then((c) => c.put(r, cp)); }
       return res;
     }).catch(() => caches.match(r, { ignoreSearch: true }).then((m) => m || caches.match('index.html')))
