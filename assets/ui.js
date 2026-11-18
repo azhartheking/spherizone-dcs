@@ -204,8 +204,11 @@ function kit(svg) {
     UI.bind(g, (S) => {
       const c = S.ctl[tag];
       v.textContent = def.hand ? fx(c.op, 0) : fx(c.pv, def.dec);
-      s.textContent = def.hand ? 'HAND  OP ' + fx(c.op, 0) + '%' : 'SP ' + fx(c.sp, def.dec) + '  OP ' + fx(c.op, 0) + '%';
-      mt.textContent = def.hand ? 'HIC' : c.mode; mb.style.display = c.mode === 'AUTO' && !def.hand ? 'none' : ''; mt.style.display = mb.style.display;
+      // heater controller with E-212 stopped: standby, not in control (PV is the same R-211 temperature as TIC-211)
+      const standby = def.standby && !S.eq[def.standby];
+      s.textContent = def.hand ? 'HAND  OP ' + fx(c.op, 0) + '%' : standby ? 'E-212 OFF · standby' : 'SP ' + fx(c.sp, def.dec) + '  OP ' + fx(c.op, 0) + '%';
+      mt.textContent = def.hand ? 'HIC' : standby ? 'OFF' : c.mode; mb.style.display = (c.mode === 'AUTO' && !def.hand && !standby) ? 'none' : ''; mt.style.display = mb.style.display;
+      g.classList.toggle('standby', !!standby);
       UI.alarmClass(g, S, tag);
       g.classList.toggle('sel', UI.sel === tag);
     });

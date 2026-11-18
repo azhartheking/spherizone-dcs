@@ -77,6 +77,7 @@ svg.gfx{display:block;width:100%;height:auto;user-select:none}
 .tagbox .s{font:10px Consolas,monospace;fill:#333}
 .tagbox .m{font:600 9px "Segoe UI";fill:var(--txt)}
 .tagbox .mbg{fill:#f7f7f7;stroke:#333;stroke-width:.8}
+.tagbox.standby .v,.tagbox.standby .s,.tagbox.standby .u{opacity:.45}
 .tagbox.a1 rect.b{stroke:var(--p1);stroke-width:2.6}.tagbox.a2 rect.b{stroke:var(--p2);stroke-width:2.6}.tagbox.a3 rect.b{stroke:var(--p3);stroke-width:2.6}
 .tagbox .ab{display:none}
 .tagbox.a1 .ab,.tagbox.a2 .ab,.tagbox.a3 .ab{display:inline}

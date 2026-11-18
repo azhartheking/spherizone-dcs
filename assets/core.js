@@ -383,7 +383,7 @@ function becomeLeader() {
   rt.S = S; rt.last = Date.now(); saveState();
 }
 // code version: a tab running newer simulator code always takes over from a tab with older code
-SZ.CODE_VER = 160;
+SZ.CODE_VER = 161;
 function heartbeat() { lsSet(LKEY, JSON.stringify({ id: rt.id, ts: Date.now(), ver: SZ.CODE_VER })); }
 function drainQueue() {
   const q = parse(lsGet(QKEY)); if (!q || !q.length) return; lsSet(QKEY, '[]');

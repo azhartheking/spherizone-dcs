@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Spherizone DCS — Operator Manual</title>
-<link rel="stylesheet" href="assets/dcs.css?v=20261118234935">
+<link rel="stylesheet" href="assets/dcs.css?v=20261119002627">
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
   .man{background:var(--panel);border:1px solid var(--line);padding:18px 26px 30px;font-size:13px;line-height:1.55;max-width:1000px}
@@ -462,7 +462,8 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 <tr><td class="l">FIC-101</td><td class="l">Catalyst feed</td><td>≈ 0.59 kg/h</td><td class="l">Gives ~30 t/h at ~50 t PP per kg catalyst</td></tr>
 <tr><td class="l">FFIC-102</td><td class="l">TEAL / catalyst</td><td>5 g/g</td><td class="l">Below 3 g/g → alarm; activity drops</td></tr>
 <tr><td class="l">FFIC-103</td><td class="l">TEAL / donor</td><td>10 g/g (BOPP 50)</td><td class="l">Higher ratio → less donor → higher XS</td></tr>
-<tr><td class="l">TIC-211</td><td class="l">MZCR temperature</td><td>80 °C (RACO 75)</td><td class="l">OP ≈ 35–40 % at 30 t/h</td></tr>
+<tr><td class="l">TIC-211</td><td class="l">MZCR temperature</td><td>80 °C (RACO 75)</td><td class="l">OP ≈ 30–40 % at 30 t/h, PV within ± 0.2 °C of SP</td></tr>
+<tr><td class="l">TIC-212</td><td class="l">Heater E-212 (standby)</td><td>78 °C (RACO 73)</td><td class="l">Shows <b>OFF · standby</b>, OP 0 %. It reads the same R-211 temperature as TIC-211, so its PV is 2 °C above its SP. That is normal: the heater is not needed while the reaction runs.</td></tr>
 <tr><td class="l">PIC-211</td><td class="l">MZCR pressure</td><td>28 barg (RACO 27)</td><td class="l">OP ≈ 50–75 % (make-up side)</td></tr>
 <tr><td class="l">AIC-211</td><td class="l">Riser H2</td><td>1–6 mol%</td><td class="l">Grade dependent (see section 6)</td></tr>
 <tr><td class="l">FIC-212</td><td class="l">Barrier flow</td><td>6 t/h (fibre 1.5)</td><td class="l">Barrier efficiency ≈ 90 % at 6 t/h</td></tr>
@@ -1103,9 +1104,9 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 </div>
 </template>
 
-<script src="assets/model.js?v=20261118234935"></script>
-<script src="assets/core.js?v=20261118234935"></script>
-<script src="assets/ui.js?v=20261118234935"></script>
+<script src="assets/model.js?v=20261119002627"></script>
+<script src="assets/core.js?v=20261119002627"></script>
+<script src="assets/ui.js?v=20261119002627"></script>
 <script>
 UI.page({
   graphic: false, faceplate: false,

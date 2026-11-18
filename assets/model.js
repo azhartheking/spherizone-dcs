@@ -61,7 +61,7 @@ SZ.CTL = {
   'FIC-201': { d: 'Fresh propylene feed to MZCR', u: 't/h', lo: 0, hi: 40, act: -1, kc: 0.6, ti: 6, page: 'mzcr', dec: 1 },
   'FIC-203': { d: 'Ethylene to MZCR (RACO)', u: 'kg/h', lo: 0, hi: 2500, act: -1, kc: 0.6, ti: 6, page: 'mzcr', dec: 0 },
   'TIC-211': { d: 'MZCR temperature → E-211 CW', u: '°C', lo: 40, hi: 110, act: 1, kc: 6, ti: 150, td: 20, ppv: true, page: 'mzcr', dec: 1 },
-  'TIC-212': { d: 'MZCR heating → E-212 steam valve (start-up / shutdown only, heater must be running)', u: '°C', lo: 40, hi: 110, act: -1, kc: 10, ti: 600, ppv: true, page: 'mzcr', dec: 1 },
+  'TIC-212': { d: 'MZCR heating → E-212 steam valve. Same R-211 temperature as TIC-211; only acts while E-212 runs (start-up / shutdown / standby). Normal operation: heater OFF, OP 0 %', u: '°C', lo: 40, hi: 110, act: -1, kc: 10, ti: 600, ppv: true, standby: 'HTR', page: 'mzcr', dec: 1 },
   'PIC-211': { d: 'MZCR pressure → split range: vent (0-30 %) / C3 make-up (30-100 %)', u: 'barg', lo: 0, hi: 40, act: -1, kc: 8, ti: 300, page: 'mzcr', dec: 2 },
   'AIC-211': { d: 'Riser H2 (GC) → H2 valve', u: 'mol%', lo: 0, hi: 10, act: -1, kc: 4, ti: 500, page: 'mzcr', dec: 2 },
   'FIC-212': { d: 'Barrier liquid C3 to downer', u: 't/h', lo: 0, hi: 12, act: -1, kc: 0.6, ti: 6, page: 'mzcr', dec: 2 },
@@ -106,8 +106,13 @@ SZ.mkCtl = mkCtl;
 SZ.upgradeState = function (S) {
   if (!S || !S.ctl) return S;
   for (const tag in SZ.CTL) if (!S.ctl[tag]) {
-    const T = S.p && S.p.T211 || 80;
-    S.ctl[tag] = mkCtl(tag, T, tag === 'TIC-212' ? 100 : 0, 'MAN');   // heater controller: MAN 100 % = the old fixed 4 MW
+    const T = S.p && S.p.T211 || 80, g = SZ.GRADES[S.target] || SZ.GRADES['H-INJ'];
+    if (tag === 'TIC-212') {
+      // running plant: heater controller waits in AUTO at recipe − 2 °C, valve shut.
+      // cold / starting plant: MAN 100 % = the old fixed 4 MW behaviour
+      const running = S.p && S.p.prodTot > 5;
+      S.ctl[tag] = running ? mkCtl(tag, g.T - 2, 0, 'AUTO') : mkCtl(tag, T, 100, 'MAN');
+    } else S.ctl[tag] = mkCtl(tag, T, 0, 'MAN');
   }
   return S;
 };
