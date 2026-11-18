@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — Trends</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:8px}</style>
+</head>
+<body data-page="trends">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const single = UI.isPop && SZ.TRENDS[decodeURIComponent(location.hash.slice(1))];   // pop-out of one trend group
+let group = decodeURIComponent(location.hash.slice(1)); if (!SZ.TRENDS[group]) group = 'temps';
+let win = 3600; try { win = +sessionStorage.getItem('sztwin') || 3600; } catch (e) { }   // remembered per window
+const setWin = (w) => { win = w; try { sessionStorage.setItem('sztwin', w); } catch (e) { } };
+UI.page({
+  graphic: false, faceplate: true, side: ['kpi'],
+  body(view) {
+    const top = UI.card('Trend', '');
+    const bd = top.querySelector('.bd');
+    const bar = UI.h('div', { class: 'tabs' });
+    const btns = {};
+    for (const k in SZ.TRENDS) { const b = UI.h('button', { on: { click: () => { group = k; history.replaceState(null, '', '#' + k); } } }, SZ.TRENDS[k][0]); btns[k] = b; bar.append(b); }
+    const ws = UI.h('div', { class: 'tabs', style: 'margin-top:4px' });
+    [[900, '15 min'], [1800, '30 min'], [3600, '60 min'], [7200, '120 min']].forEach(([w, l]) => { const b = UI.h('button', { on: { click: () => setWin(w) } }, l); UI.bind(b, () => b.classList.toggle('on', win === w)); ws.append(b); });
+    const ch = single ? Math.max(220, window.innerHeight - 230) : 340;
+    const cv = UI.h('canvas', { class: 'trend', height: ch, style: 'height:' + ch + 'px;margin-top:6px' }), lg = UI.h('div', { class: 'legend' });
+    if (single) { bar.style.display = 'none'; window.addEventListener('resize', () => { const n = Math.max(220, window.innerHeight - 230); cv.style.height = n + 'px'; cv.setAttribute('height', n); cv.width = 0; }); }
+    const pb = UI.h('button', { style: 'margin-left:6px', title: 'Open this trend in its own window', on: { click: () => UI.popout('trends', group, 760, 460) } }, '⧉ Pop out this trend');
+    if (!UI.isPop) ws.append(pb);
+    bd.append(bar, ws, cv, lg);
+    UI.bind(cv, (S) => { for (const k in btns) btns[k].classList.toggle('on', k === group); top.querySelector('h3').firstChild.textContent = 'Trend — ' + SZ.TRENDS[group][0]; UI.drawTrend(cv, lg, S, SZ.TRENDS[group][1], win); });
+    view.append(top);
+    const grid = UI.h('div', { class: 'tgrid' });
+    for (const k in SZ.TRENDS) {
+      const c = UI.card(SZ.TRENDS[k][0]); const c2 = UI.h('canvas', { class: 'trend', height: 130, style: 'height:130px;cursor:pointer' }), l2 = UI.h('div', { class: 'legend' });
+      c2.addEventListener('click', () => { group = k; history.replaceState(null, '', '#' + k); window.scrollTo(0, 0); });
+      c.querySelector('.bd').append(c2, l2); grid.append(c);
+      UI.bind(c2, (S) => UI.drawTrend(c2, l2, S, SZ.TRENDS[k][1], win));
+    }
+    if (!single) view.append(grid);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — Overview</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="index">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+UI.page({
+  defaultTag: 'TIC-211',
+  side: ['kpi', 'trend:prod'],
+  draw(d) {
+    // ---- process areas (click to open the area page)
+    d.area(20, 40, 230, 262, '100 CATALYST & PRECONTACT', 'catalyst.html');
+    d.area(270, 40, 335, 425, '200 MZCR  R-211', 'mzcr.html');
+    d.area(620, 40, 170, 222, '300 HP FLASH', 'flash.html');
+    d.area(810, 40, 205, 300, '400 GPR (HECO)', 'gpr.html');
+    d.area(1025, 40, 160, 300, 'QUALITY', 'quality.html');
+    d.area(620, 360, 565, 280, '500/600 FINISHING', 'finishing.html');
+    d.area(20, 320, 230, 320, 'UTILITIES & SIS', 'instructor.html');
+
+    // ---- Area 100
+    [['D-101', 40, 'cat'], ['D-102', 95, 'TEAL'], ['D-103', 150, 'donor']].forEach(([t, x, s]) => {
+      d.rect(x, 80, 30, 52, 'eq', 8); d.label(x + 15, 76, t, 'lbl s', 'middle'); d.label(x + 15, 110, s, 'lbl s', 'middle');
+      d.pipe([[x + 15, 132], [x + 15, 150], [78, 150], [78, 165]], 'cat thin', { noArrow: x !== 95 });
+    });
+    d.dyn(192, 110, S => S.donor + '-donor', 'lbl s');
+    d.vessel(60, 165, 36, 40); d.label(78, 220, 'D-104', 'lbl s', 'middle');
+    d.vessel(150, 160, 36, 52); d.label(168, 226, 'R-101', 'lbl s', 'middle');
+    d.pipe([[96, 185], [148, 185]], 'cat');
+    d.pipe([[186, 186], [258, 186], [258, 440], [392, 440], [392, 416]], 'cat');
+    d.tag(28, 244, 'FIC-101');
+    d.ind(150, 250, 'TI-101 prepoly', S => S.p.T101, '°C', 1, 92);
+
+    // ---- Area 200 MZCR
+    d.rect(380, 58, 96, 40, 'eq', 6);
+    d.rect(380, 96, 24, 306, 'eq'); d.rect(440, 96, 36, 306, 'eq'); d.rect(380, 398, 96, 18, 'eq', 4);
+    d.rect(444, 120, 28, 278, 'bed');
+    d.label(392, 250, 'RISER', 'lbl s', 'middle').setAttribute('transform', 'rotate(-90 392 250)');
+    d.label(458, 260, 'DOWNER', 'lbl s', 'middle').setAttribute('transform', 'rotate(-90 458 260)');
+    d.label(428, 82, 'R-211', 'lbl', 'middle');
+    d.motor(312, 80, 'K211', 'comp', 'K-211');
+    d.hx(312, 150, 'E-211');
+    d.pipe([[380, 72], [345, 72], [345, 80], [332, 80]], 'gas');
+    d.pipe([[294, 80], [284, 80], [284, 150], [294, 150]], 'gas', { noArrow: true });
+    d.pipe([[328, 150], [340, 150], [340, 410], [378, 410]], 'gas');
+    d.pipe([[540, 104], [490, 104], [490, 140], [478, 140]], 'liq');
+    d.label(500, 98, 'C3 barrier', 'lbl s');
+    d.tag(478, 160, 'TIC-211'); d.tag(478, 214, 'AIC-211'); d.tag(478, 268, 'FIC-212');
+    d.ind(478, 322, 'R-211 production', S => S.p.rMZ, 't/h', 1, 118);
+    d.ind(478, 360, 'Downer H2 AI-212', S => S.p.H2d, 'mol%', 2, 118);
+    d.ind(282, 425, 'Dew margin', S => S.p.dew, 'bar', 1, 90, 'PIC-211');
+    d.pipe([[458, 416], [458, 452], [605, 452], [605, 110], [638, 110]], '');
+
+    // ---- Area 300 flash
+    d.vessel(640, 72, 44, 80); d.label(662, 166, 'D-301', 'lbl s', 'middle');
+    d.tag(630, 180, 'PIC-301');
+    d.pipe([[684, 130], [848, 130]], '', { live: S => S.eq.GPR });
+    d.pipe([[772, 130], [772, 350], [673, 350], [673, 398]], '');
+    d.dyn(778, 160, S => S.eq.GPR ? '' : 'GPR BYPASS', 'lbl s');
+
+    // ---- Area 400 GPR
+    d.vessel(850, 72, 60, 140); d.level(856, 90, 48, 116, S => S.p.lvl401); d.label(880, 226, 'R-401', 'lbl s', 'middle');
+    d.motor(960, 90, 'K401', 'comp', 'K-401');
+    d.hx(960, 160, 'E-401');
+    d.pipe([[880, 72], [880, 60], [990, 60], [990, 90], [980, 90]], 'gas');
+    d.pipe([[942, 90], [935, 90], [935, 160], [944, 160]], 'gas', { noArrow: true });
+    d.pipe([[944, 160], [925, 160], [925, 195], [912, 195]], 'gas');
+    d.pipe([[850, 200], [774, 200]], '', { live: S => S.eq.GPR });
+    d.dyn(1006, 56, S => S.eq.GPR ? 'IN SERVICE' : 'BYPASS', 'lbl', 'end');
+    d.tag(820, 240, 'TIC-401');
+    d.ind(820, 292, 'Bed level LIC-401', S => S.p.lvl401, '%', 1, 118, 'LIC-401');
+
+    // ---- Quality summary
+    d.ind(1033, 64, 'Target grade', S => S.target, '', 0, 144);
+    d.ind(1033, 102, 'MFR pellet', S => S.p.pel.MFR, 'g/10', 2, 144);
+    d.ind(1033, 140, 'XS pellet', S => S.p.pel.XS, 'wt%', 2, 144);
+    d.ind(1033, 178, 'PI pellet', S => S.p.pel.PI, '', 2, 144);
+    d.ind(1033, 216, 'C2 / rubber', S => fx(S.p.pel.C2, 1) + ' / ' + fx(S.p.pel.RUB, 1), '%', 1, 144);
+    d.ind(1033, 254, 'Pellets', S => S.p.pelOk ? 'ON-SPEC' : 'OFF-SPEC', '', 0, 144, 'LAB');
+    d.ind(1033, 292, 'On / off-spec', S => fx(S.tons.on, 0) + ' / ' + fx(S.tons.off, 0), 't', 0, 144);
+
+    // ---- Area 500/600
+    d.vessel(650, 400, 46, 100); d.label(673, 514, 'D-501', 'lbl s', 'middle'); d.label(673, 526, 'steamer/dryer', 'lbl s', 'middle');
+    d.pipe([[696, 470], [760, 470], [760, 385], [835, 385], [835, 393]], '');
+    d.vessel(800, 395, 70, 140); d.level(806, 410, 58, 112, S => S.p.siloLvl); d.label(835, 549, 'D-601 silo', 'lbl s', 'middle');
+    d.pipe([[870, 470], [948, 470]], '');
+    d.motor(990, 470, 'EX601', 'ext', 'EX-601');
+    d.pipe([[1032, 470], [1160, 470]], '');
+    d.label(1050, 460, 'Pellets → bagging', 'lbl s');
+    d.ind(940, 510, 'Extruder rate', S => S.p.exRate, 't/h', 1, 100);
+    d.tag(760, 570, 'LIC-601');
+    d.ind(640, 574, 'Steam D-501', S => S.eq.STEAM ? 'ON' : 'OFF', '', 0, 110, 'D-501');
+    d.ind(1050, 574, 'Total production', S => S.p.prodTot, 't/h', 1, 120);
+
+    // ---- Utilities & SIS
+    d.motor(50, 370, 'P701', 'pump', 'P-701');
+    d.label(74, 366, 'CW supply → E-211 / E-401', 'lbl s'); d.dyn(74, 380, S => 'CW return ' + fx(S.p.cwT, 1) + ' °C', 'lbl s');
+    d.ind(30, 415, 'XV-901 CO kill', S => S.sis.kill, '', 0, 200, 'XV-901');
+    d.ind(30, 455, 'SIS', S => S.sis.bypass ? 'BYPASSED' : 'NORMAL', '', 0, 200, 'SIS');
+    d.ind(30, 495, 'Catalyst SIS cut', S => S.sis.catCut ? 'CUT — reset req.' : 'normal', '', 0, 200, 'FIC-101');
+    d.ind(30, 535, 'AI-001 feed poisons', S => fx(S.poison.H2O + S.poison.CO + S.poison.COS, 1), 'ppm', 1, 200, 'AI-001');
+    d.ind(30, 575, 'Fouling index R-211', S => S.p.foul, '%', 1, 200);
+  }
+});
+</script>
+</body>
+</html>

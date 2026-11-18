@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — 400 GPR</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="gpr">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+UI.page({
+  defaultTag: 'AIC-401',
+  side: ['kpi', 'trend:gpr'],
+  draw(d) {
+    d.label(20, 28, 'AREA 400 — FLUIDISED-BED GAS-PHASE REACTOR R-401 (HECO RUBBER PHASE)', 'lbl big');
+    d.label(480, 56, 'HS-302', 'lbl');
+    d.btn(530, 42, 92, () => 'IN SERVICE', () => SZ.cmd({ type: 'gpr', on: true }), S => S.eq.GPR);
+    d.btn(626, 42, 80, () => 'BYPASS', () => SZ.cmd({ type: 'gpr', on: false }), S => !S.eq.GPR);
+    // reactor
+    d.vessel(480, 120, 140, 330, 'R-401', 'fluidised bed · 70–80 °C · 10–18 barg');
+    // PSV-401 on R-401 → flare header
+    d.pipe([[605, 128], [605, 110]], 'thin', { noArrow: true });
+    const o401 = d.psv(605, 98, 'PSV-401', 'r');
+    const f401 = d.pipe([[o401.x, o401.y], [648, o401.y]], 'flare', { noArrow: true });
+    UI.bind(f401, (S) => f401.classList.toggle('hot', !!(S.psv && S.psv['PSV-401'] && S.psv['PSV-401'].open)));
+    d.link(650, o401.y, 'TO FLARE (900)', 'utilities.html#PSV-401', 'r');
+    d.level(490, 160, 120, 270, S => S.p.lvl401);
+    d.rect(486, 432, 128, 4, 'eq2');
+    d.ind(495, 180, 'LI-401', S => S.p.lvl401, '%', 1, 110, 'LIC-401');
+    // powder in
+    d.link(20, 200, 'FROM D-301 (300)', 'flash.html#PIC-301', 'l');
+    d.pipe([[150, 200], [478, 200]], '', { live: S => S.eq.GPR });
+    // cycle gas loop
+    d.pipe([[550, 120], [550, 70], [800, 70], [800, 72]], 'gas');
+    d.motor(800, 90, 'K401', 'comp', ''); d.label(826, 94, 'K-401', 'lbl');
+    d.pipe([[800, 106], [800, 202]], 'gas');
+    d.hx(800, 220, ''); d.label(826, 254, 'E-401', 'lbl');
+    d.pipe([[800, 236], [800, 600], [550, 600], [550, 452]], 'gas');
+    d.pipe([[990, 220], [818, 220]], 'cw'); d.valve(900, 220, 'TIC-401', false, 'TV'); d.label(994, 224, 'CW (P-701)', 'lbl s');
+    d.tag(840, 150, 'TIC-401');
+    // gas make-up feeds
+    [['PIC-401', 'C3 make-up'], ['AIC-401', 'Ethylene'], ['AIC-402', 'Hydrogen']].forEach(([tag, lab], i) => {
+      const y = 300 + 60 * i; d.pipe([[1190, y], [802, y]], i === 2 ? 'gas thin' : 'liq'); d.valve(950, y, tag, false); d.tag(1060, y - 50, tag); d.label(830, y - 6, lab, 'lbl s');
+    });
+    // discharge
+    d.pipe([[480, 420], [186, 420]], '', { live: S => S.eq.GPR });
+    d.valve(380, 420, 'LIC-401', false, 'LV');
+    d.tag(300, 340, 'LIC-401');
+    d.link(20, 420, 'TO D-501 STEAMER (500)', 'finishing.html#LIC-601', 'l');
+    // indicators
+    const rows = [['Rubber production', S => S.p.rG, 't/h', 2], ['Rubber inst.', S => S.p.inst.RUB, '%', 1], ['C2 in EPR', S => S.p.c2epr, 'wt%', 1],
+      ['MFR rubber phase', S => S.p.mfrRub, 'g/10', 2], ['Izod inst.', S => S.p.inst.IZOD, 'kJ/m²', 1], ['Bed mass', S => S.p.M401, 't', 1],
+      ['Discharge', S => S.p.dis401, 't/h', 1], ['Chunk index', S => S.p.chunk, '', 1]];
+    rows.forEach((r, i) => d.ind(645, 280 + i * 38, r[0], r[1], r[2], r[3], 140));
+    d.dyn(20, 640, S => S.eq.GPR ? 'R-401 IN SERVICE — rubber (EPR) is polymerised inside the homopolymer matrix particles from R-211.' : 'R-401 BYPASSED (HOMO / RACO). Powder routes directly from D-301 to D-501.', 'lbl s');
+  }
+});
+</script>
+</body>
+</html>

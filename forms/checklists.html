@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone — Start-up and Shutdown Checklists</title>
+<link rel="stylesheet" href="forms.css">
+<style>@page{size:A4 portrait;margin:0}</style>
+</head>
+<body class="portrait" data-doc="SZ-OPS-CL-001" data-rev="1.4" data-unit="Unit 200 · Spherizone PP (training plant)">
+<div class="noprint">Print with <b>Ctrl+P → Save as PDF</b>, A4 portrait, margins <b>None</b>, "Background graphics" ON. Or use the ready PDF in the project folder.</div>
+
+<!-- ===================== PAGE 1 — COVER & DOCUMENT CONTROL ===================== -->
+<div class="sheet" data-t="Start-up and Shutdown Checklists" data-s="Document control and instructions for use">
+<h1 style="margin-top:4mm">Start-up and Shutdown Checklists</h1>
+<p style="font-size:11pt">Spherizone PP plant — multizone circulating reactor R-211 with gas-phase reactor R-401<br><span class="mut">Operating checklists for the DCS training simulator · use with the Student Manual v1.4, chapter 8</span></p>
+
+<h2>Contents</h2>
+<table class="t">
+<tr><th>Part</th><th style="text-align:left">Checklist</th><th>Form</th><th>Page</th></tr>
+<tr><td class="c">1</td><td>Pre-start-up safety review (PSSR)</td><td class="c">SZ-CL-01</td><td class="c">2</td></tr>
+<tr><td class="c">2</td><td>Full plant start-up from cold — phases A to C (utilities, heat-up, pressurise)</td><td class="c">SZ-CL-02</td><td class="c">3</td></tr>
+<tr><td class="c">3</td><td>Full plant start-up from cold — phases D to G (chemicals, light-off, rate, spec)</td><td class="c">SZ-CL-02</td><td class="c">4</td></tr>
+<tr><td class="c">4</td><td>Controlled plant shutdown</td><td class="c">SZ-CL-03</td><td class="c">5</td></tr>
+<tr><td class="c">5</td><td>Emergency shutdown (CO kill), restart after a trip, hot standby</td><td class="c">SZ-CL-04</td><td class="c">6</td></tr>
+<tr><td class="c">6</td><td>Setpoint reference card, deviation record and final sign-off</td><td class="c">SZ-CL-05</td><td class="c">7</td></tr>
+</table>
+
+<h2>Document control</h2>
+<table class="t">
+<tr><th style="width:25%">Item</th><th style="text-align:left">Detail</th></tr>
+<tr><td>Document number</td><td>SZ-OPS-CL-001</td></tr>
+<tr><td>Revision</td><td>1.4 — matches simulator and Student Manual v1.4 (November 2026)</td></tr>
+<tr><td>Applies to</td><td>Areas 100 (catalyst), 200 (MZCR R-211), 300 (HP flash), 400 (GPR R-401), 500/600 (finishing)</td></tr>
+<tr><td>Grades covered</td><td>H-RAFFIA, H-INJ, H-FIBER, H-BOPP (homopolymer) · R-7 (random copolymer). HECO I-12 is reached by grade change after start-up (manual §7.5).</td></tr>
+</table>
+<table class="t" style="margin-top:2mm">
+<tr><th style="width:18%">Role</th><th>Name</th><th>Signature</th><th style="width:20%">Date</th></tr>
+<tr><td>Prepared by</td><td style="height:8mm"></td><td></td><td></td></tr>
+<tr><td>Reviewed by</td><td style="height:8mm"></td><td></td><td></td></tr>
+<tr><td>Approved by</td><td style="height:8mm"></td><td></td><td></td></tr>
+</table>
+
+<h2>How to use these checklists</h2>
+<ol style="margin:1mm 0 1mm 5mm;padding-left:3mm">
+<li>Use a <b>new printed copy</b> for every start-up or shutdown. Fill in the header fields before you begin.</li>
+<li>Do the steps <b>in order</b>. After each step, check the <i>Verify</i> column on the DCS, write the actual reading, tick ☑ and write the time and your initials.</li>
+<li>If a verification fails, <b>stop</b>. Do not continue to the next step. Return the plant to a safe state, record it in the deviation record (page 7) and inform the shift supervisor.</li>
+<li>At a <span class="hpbadge">HOLD POINT</span> the shift supervisor checks the plant condition and signs before anyone continues.</li>
+<li>Any step you skip or change must be recorded in the deviation record, with the reason and approval.</li>
+</ol>
+<div class="legend" style="margin-top:2mm">
+<span><span class="field dcs">DCS</span></span><span>Action by the panel operator in the control room (done in the simulator)</span>
+<span><span class="field f">FIELD</span></span><span>Action or check by the field operator on the plant. In real plants these are essential. <b>In the training simulator they are not simulated</b>: discuss them, then tick.</span>
+<span><span class="hpbadge">HP</span></span><span>Hold point. Supervisor signature required before continuing.</span>
+<span class="chk">☐</span><span>Tick when the step is done <b>and</b> verified.</span>
+</div>
+<div class="box warn small" style="margin-top:3mm"><b>Training document.</b> Setpoints, limits and procedures are those of the training model. They are not licensor data and must never be used to operate a real plant. Spherizone is a trademark of the LyondellBasell family of companies; this is an independent educational project.</div>
+</div>
+
+<!-- ===================== PAGE 2 — PSSR ===================== -->
+<div class="sheet" data-t="SZ-CL-01 · Pre-start-up Safety Review (PSSR)" data-s="Complete and sign before the start-up checklist">
+<div class="fields c3">
+<div>Date <span class="fill"></span></div><div>Shift <span class="fill"></span></div><div>Target grade <span class="fill"></span></div>
+<div>Shift supervisor <span class="fill"></span></div><div>Panel operator <span class="fill"></span></div><div>Field operator <span class="fill"></span></div>
+</div>
+<table class="t">
+<tr><th>#</th><th style="text-align:left">Check item</th><th>By</th><th>OK</th><th>Init</th><th style="width:38mm">Remarks</th></tr>
+<tr class="sec"><td colspan="6">A. Permits, isolations and maintenance</td></tr>
+<tr><td class="n">1</td><td>All work permits for Areas 100–600 closed or formally suspended</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">2</td><td>Lock-out / tag-out removed; electrical isolations restored for P-701, K-211, K-401, EX-601, P-102, P-103</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">3</td><td>Spades / blinds removed per blind list; drains and vents closed</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">4</td><td>Reactor and vessels leak-tested and nitrogen-purged (O₂ &lt; 0.5 %)</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr class="sec"><td colspan="6">B. Safety systems</td></tr>
+<tr><td class="n">5</td><td>SIS status <b>NORMAL</b> — no bypass active (Instructor / Overview page)</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">6</td><td>XV-901 CO kill state <b>NORMAL</b> (not armed, not injected); CO bottles in service</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">7</td><td>No SIS catalyst cut active (FIC-101 faceplate)</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">8</td><td>Alarm list read and acknowledged; no unexplained P1 alarms</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">9a</td><td>PSV inlet/outlet block valves <b>locked open</b> (PSV-211, -301, -401); flare pilot lit; D-901 knock-out drum drained; flare header N₂ purge on</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">9</td><td>Fire and gas detection, deluge and safety showers in service</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr class="sec"><td colspan="6">C. Utilities available</td></tr>
+<tr><td class="n">10</td><td>Cooling water supply available (CW header pressure normal)</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">11</td><td>Steam (D-501, E-212 heater), nitrogen, instrument air and power available</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">12</td><td>Propylene, ethylene and hydrogen battery-limit valves open; feed poisons AI-001 &lt; 0.5 ppm</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr class="sec"><td colspan="6">D. Process line-up and chemicals</td></tr>
+<tr><td class="n">13</td><td>Correct external donor drum lined up for the grade (C-donor; D-donor for H-BOPP) — Catalyst page</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">14</td><td>Catalyst D-101, TEAL D-102 and donor D-103 drum levels sufficient; TEAL area pyrophoric precautions in place</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">15</td><td>HS-302 GPR routing set to <b>BYPASS</b> (start-up is on HOMO/RACO)</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">16</td><td>Additive package on EX-601 matches the grade recipe (Finishing page / setpoint card)</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">17</td><td>All controllers in MAN, OP 0 % (PIC-211 at 30 %); all motors stopped; R-211 at ≈ 25 °C / 1 barg</td><td class="c"><span class="field dcs">DCS</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr class="sec"><td colspan="6">E. People and communication</td></tr>
+<tr><td class="n">18</td><td>Start-up team briefed (this checklist, hold points, emergency actions on page 6)</td><td class="c">ALL</td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">19</td><td>Radios tested; field operator stationed at Area 200; PPE per area requirements</td><td class="c"><span class="field f">FIELD</span></td><td class="box"></td><td class="w"></td><td></td></tr>
+<tr><td class="n">20</td><td>Downstream (bagging / logistics) and laboratory informed of start-up time and grade</td><td class="c">ALL</td><td class="box"></td><td class="w"></td><td></td></tr>
+</table>
+<div class="box" style="margin-top:3mm"><b>PSSR result:</b> &nbsp; <span class="chk">☐</span> Ready for start-up &nbsp;&nbsp; <span class="chk">☐</span> Not ready — open items recorded on page 7
+<div class="sig"><div><b>Shift supervisor</b>Name / signature / time</div><div><b>Panel operator</b>Name / signature</div><div><b>Field operator</b>Name / signature</div></div></div>
+</div>
+
+<!-- ===================== PAGE 3 — START-UP A–C ===================== -->
+<div class="sheet" data-t="SZ-CL-02 · Full Plant Start-up from Cold (1/2)" data-s="Phases A–C: utilities, heat-up, pressurise — manual §8.4">
+<div class="fields c4">
+<div>Date <span class="fill"></span></div><div>Grade <span class="fill"></span></div><div>Start time <span class="fill"></span></div><div>PSSR signed <span class="chk">☐</span></div>
+<div>Supervisor <span class="fill"></span></div><div>Panel op. <span class="fill"></span></div><div>Field op. <span class="fill"></span></div><div>Sim mode <span class="chk">☐</span>EASY <span class="chk">☐</span>HARD</div>
+</div>
+<div class="box note small"><b>Remember:</b> switching a controller to AUTO keeps its SP at 0 on a cold plant — <b>always type the setpoint</b>. Heat before you pressurise: keep the dew-point margin &gt; 3 bar at every step.</div>
+<table class="t">
+<tr><th>#</th><th style="text-align:left">Action</th><th>Tag</th><th>Setpoint / target</th><th style="text-align:left">Verify on DCS</th><th>Actual</th><th>✓</th><th>Time</th><th>Init</th></tr>
+<tr class="ph"><td colspan="9">PHASE A — Utilities and circulation</td></tr>
+<tr><td class="n">1</td><td>Start cooling-water pump <span class="field dcs">DCS</span></td><td class="tag">P-701</td><td class="c">RUN</td><td>Pump running (dark symbol). CW return 28–33 °C</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">1a</td><td>Check CW flow and no leaks at E-211 / E-401 <span class="field f">FIELD</span></td><td class="tag">E-211</td><td class="c">—</td><td>Field confirms by radio</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">2</td><td>Start cycle-gas compressor <span class="field dcs">DCS</span></td><td class="tag">K-211</td><td class="c">RUN</td><td>K-211 running and stays running (dew margin &gt; 0.5 bar)</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">2a</td><td>Lube oil, seal gas and suction knock-out drum checked <span class="field f">FIELD</span></td><td class="tag">K-211</td><td class="c">—</td><td>Field confirms by radio</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">3</td><td>Set solids circulation (hand station) <span class="field dcs">DCS</span></td><td class="tag">HIC-213</td><td class="c">OP 55 %</td><td>Particle flow shown in riser and downer</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="ph"><td colspan="9">PHASE B — Heat-up</td></tr>
+<tr><td class="n">4</td><td>Start start-up heater. Keep TIC-211 in MAN, OP 0 %. Keep PIC-211 SP ≤ 5 barg <span class="field dcs">DCS</span></td><td class="tag">E-212<br>TIC-211</td><td class="c">T ≥ 75 °C<br><span class="small mut">(step ticks at 70)</span></td><td>"Heater ON 4 MW". T rises ≈ 0.8 °C/min. Record T every 15 min below</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td colspan="9" class="small">Heat-up record — time / TIC-211 PV (°C): &nbsp;___/___ &nbsp; ___/___ &nbsp; ___/___ &nbsp; ___/___ &nbsp; ___/___ &nbsp; ___/___ &nbsp; ___/___</td></tr>
+<tr class="ph"><td colspan="9">PHASE C — Pressurise and line up</td></tr>
+<tr><td class="n">5</td><td>PIC-211 → AUTO. Raise SP in stages; before each raise confirm the dew-point margin &gt; 3 bar <span class="field dcs">DCS</span></td><td class="tag">PIC-211</td><td class="c">10 → 18 → 24 →<br><b>28 barg</b> (R-7: <b>27</b>)</td><td>PIC-211 OP &gt; 30 % (make-up side). Safe max: 26 barg at 70 °C, 30 barg at 75 °C</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td colspan="9" class="small">Pressurising record — SP (barg) / PV (barg) / T (°C) / dew margin (bar): &nbsp; 10: ___/___/___ &nbsp; 18: ___/___/___ &nbsp; 24: ___/___/___ &nbsp; final: ___/___/___</td></tr>
+<tr><td class="n">6</td><td>Line up the HP flash: PIC-301 → AUTO, SP 18 <span class="field dcs">DCS</span></td><td class="tag">PIC-301</td><td class="c">18 barg</td><td>PIC-301 in AUTO at SP 18</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="hp"><td class="n hpl">HP1</td><td colspan="8"><span class="hpbadge">HOLD POINT 1</span> <b>Hot standby verified</b> — K-211 and P-701 running · TIC-211 ≥ 75 °C · PIC-211 at SP ± 1 barg · dew margin &gt; 3 bar · PIC-301 AUTO · no P1 alarms.<br>
+T ____ °C &nbsp; P ____ barg &nbsp; margin ____ bar &nbsp;&nbsp; Supervisor: ______________________ &nbsp; Time: ________</td></tr>
+</table>
+<div class="box small" style="margin-top:3mm"><b>If the dew-point margin falls below 3 bar:</b> stop raising the pressure. Lower the PIC-211 SP by 2–3 barg and keep heating. Below 0.5 bar K-211 trips on liquid carry-over, and the heater E-212 trips with it. To recover: lower the pressure until the margin is &gt; 3 bar, then restart K-211, then E-212.</div>
+<div class="box"><b>Notes</b><div class="lines"><div></div><div></div><div></div></div></div>
+</div>
+
+<!-- ===================== PAGE 4 — START-UP D–G ===================== -->
+<div class="sheet" data-t="SZ-CL-02 · Full Plant Start-up from Cold (2/2)" data-s="Phases D–G: chemicals and feeds, light-off, finishing, rate and specification">
+<table class="t">
+<tr><th>#</th><th style="text-align:left">Action</th><th>Tag</th><th>Setpoint / target</th><th style="text-align:left">Verify on DCS</th><th>Actual</th><th>✓</th><th>Time</th><th>Init</th></tr>
+<tr class="ph"><td colspan="9">PHASE D — Chemicals and feeds (plant in hot standby)</td></tr>
+<tr><td class="n">6b</td><td>Donor drum for the grade lined up; TEAL and catalyst drums ready <span class="field f">FIELD</span></td><td class="tag">D-101/2/3</td><td class="c">C (BOPP: D)</td><td>Catalyst page shows the correct donor</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">7</td><td>Start TEAL and donor pumps. FFIC-102 → AUTO, FFIC-103 → AUTO <span class="field dcs">DCS</span></td><td class="tag">P-102 P-103<br>FFIC-102<br>FFIC-103</td><td class="c"><b>5 g/g</b><br><b>10 g/g</b> (BOPP 50)</td><td>Both in AUTO at SP. Flows stay near zero until catalyst starts — normal</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">8</td><td>Barrier → AUTO. Fresh propylene → AUTO at the low start-up rate <span class="field dcs">DCS</span></td><td class="tag">FIC-212<br>FIC-201</td><td class="c"><b>6 t/h</b> (FIBER 1.5)<br><b>5 t/h</b></td><td>Total feed ≤ 12 t/h. PIC-211 holds P by venting (OP &lt; 30 %)</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">9</td><td>Riser hydrogen → AUTO <span class="field dcs">DCS</span></td><td class="tag">AIC-211</td><td class="c">R-7 <b>1.75</b> · INJ <b>2.98</b><br>RAF <b>0.97</b> · FIB <b>2.36</b><br>BOPP <b>1.04</b> mol%</td><td>Riser H₂ reaches SP in 10–20 min. Downer H₂ (AI-212) ≈ 10 % of riser</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="hp"><td class="n hpl">HP2</td><td colspan="8"><span class="hpbadge">HOLD POINT 2</span> <b>Authorisation for catalyst injection</b> — HP1 conditions still met · TEAL/donor in AUTO at SP · barrier and H₂ at SP · SIS NORMAL · XV-901 NORMAL · laboratory ready for first sample.<br>
+Supervisor: ______________________ &nbsp; Time: ________</td></tr>
+<tr class="ph"><td colspan="9">PHASE E — Light-off</td></tr>
+<tr><td class="n">10</td><td>Start catalyst feeder D-101. FIC-101 → AUTO at the light-off rate. TIC-211 → AUTO <span class="field dcs">DCS</span></td><td class="tag">FIC-101<br>TIC-211</td><td class="c"><b>0.2 kg/h</b><br><b>80 °C</b> (R-7: <b>75</b>)</td><td>Catalyst ≈ 0.2 kg/h. Production appears after ≈ 30 min. TIC-211 in AUTO</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">11</td><td>Reaction lit off: stop the start-up heater <span class="field dcs">DCS</span></td><td class="tag">E-212</td><td class="c">at prod. &gt; 5 t/h</td><td>Heat of reaction &gt; 3 MW. TIC-211 opens E-211 to hold SP</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="ph"><td colspan="9">PHASE F — Finishing on line</td></tr>
+<tr><td class="n">12</td><td>Steam to D-501 ON. When silo &gt; 20 %: start EX-601, LIC-601 → AUTO <span class="field dcs">DCS</span></td><td class="tag">D-501<br>EX-601<br>LIC-601</td><td class="c">ON<br>RUN<br><b>50 %</b></td><td>Extruder rate follows production; silo level steady</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">12a</td><td>Additive feeders filled and set; pellet water, dryer and bagging running <span class="field f">FIELD</span></td><td class="tag">EX-601</td><td class="c">per recipe</td><td>Field confirms by radio</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="ph"><td colspan="9">PHASE G — Rate and specification</td></tr>
+<tr><td class="n">13</td><td>Ramp catalyst ≤ 0.05 kg/h every 10 min to the final value. Raise fresh C₃ ≈ 0.75 × production. RACO: add ethylene above 15 t/h in three steps <span class="field dcs">DCS</span></td><td class="tag">FIC-101<br>FIC-201<br>FIC-203</td><td class="c">R-7 <b>0.70</b> · INJ <b>0.59</b> kg/h<br>up to <b>22 t/h</b><br>400→800→<b>1167</b> kg/h</td><td>Production ≥ 27 t/h. TIC-211 OP &lt; 50 %. PIC-211 OP on make-up side</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td colspan="9" class="small">Ramp record — time / FIC-101 SP / production t/h / TIC-211 OP %: &nbsp; ___/___/___/___ &nbsp; ___/___/___/___ &nbsp; ___/___/___/___ &nbsp; ___/___/___/___ &nbsp; ___/___/___/___</td></tr>
+<tr><td class="n">14</td><td>Spot sample; check MFR, XS, C₂ against the grade spec. Correct with AIC-211 if needed <span class="field dcs">DCS</span></td><td class="tag">LAB</td><td class="c">grade spec</td><td>Header shows <b>ON-SPEC</b>. Session card shows <b>COMPLETE</b></td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="hp"><td class="n hpl">HP3</td><td colspan="8"><span class="hpbadge">HOLD POINT 3</span> <b>Plant handed over to normal operation</b> — production ____ t/h · pellets ON-SPEC · off-spec made ____ t · SIS trips during start-up ____ · total time ________<br>
+Supervisor: ______________________ &nbsp; Time: ________ &nbsp; → continue logging on the Operator Log Sheet SZ-OPS-LOG-001</td></tr>
+</table>
+<div class="box"><b>Notes</b><div class="lines"><div></div><div></div></div></div>
+</div>
+
+<!-- ===================== PAGE 5 — SHUTDOWN ===================== -->
+<div class="sheet" data-t="SZ-CL-03 · Controlled Plant Shutdown" data-s="From steady state to stopped and depressurised — manual §8.6 (≈ 5½ h)">
+<div class="fields c4">
+<div>Date <span class="fill"></span></div><div>Grade <span class="fill"></span></div><div>Start time <span class="fill"></span></div><div>Reason <span class="fill"></span></div>
+<div>Supervisor <span class="fill"></span></div><div>Panel op. <span class="fill"></span></div><div>Field op. <span class="fill"></span></div><div>Sim mode <span class="chk">☐</span>EASY <span class="chk">☐</span>HARD</div>
+</div>
+<div class="box warn small"><b>The trap:</b> as production falls, cold feed keeps removing heat. R-211 cools, the vapour pressure drops, the dew margin collapses, K-211 trips and the SIS fires the CO kill. <b>Reduce feed with production, and hold the temperature with E-212 below 10 t/h.</b></div>
+<table class="t">
+<tr><th>#</th><th style="text-align:left">Action</th><th>Tag</th><th>Setpoint / target</th><th style="text-align:left">Verify on DCS</th><th>Actual</th><th>✓</th><th>Time</th><th>Init</th></tr>
+<tr class="hp"><td class="n hpl">HP0</td><td colspan="8"><span class="hpbadge">HOLD POINT</span> <b>Shutdown authorised</b> — downstream, laboratory and logistics informed. Supervisor: __________________ Time: ______</td></tr>
+<tr class="ph"><td colspan="9">PHASE A — Stop the reaction</td></tr>
+<tr><td class="n">1</td><td>Cut catalyst: FIC-101 → MAN, OP 0 % (or stop feeder D-101)</td><td class="tag">FIC-101</td><td class="c">0 kg/h</td><td>Catalyst flow 0. Production decays over 1½–2 h</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">2</td><td>Comonomer off: FIC-203 → MAN 0 %. On HECO also AIC-401 → MAN 0 %</td><td class="tag">FIC-203<br>AIC-401</td><td class="c">0</td><td>Ethylene flow &lt; 10 kg/h</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="ph"><td colspan="9">PHASE B — Feed down, hold temperature</td></tr>
+<tr><td class="n">3</td><td>Keep fresh C₃ SP ≈ 0.7 × production</td><td class="tag">FIC-201</td><td class="c">30→21, 15→10, 5→3.5 t/h</td><td>Production &lt; 15 t/h with FIC-201 ≤ 0.8 × prod. + 2</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td colspan="9" class="small">Feed-down record — time / production t/h / FIC-201 SP / TIC-211 PV / dew margin: &nbsp; ___/___/___/___/___ &nbsp; ___/___/___/___/___ &nbsp; ___/___/___/___/___ &nbsp; ___/___/___/___/___</td></tr>
+<tr><td class="n">4</td><td>Below 10 t/h start the heater; keep TIC-211 in AUTO</td><td class="tag">E-212</td><td class="c">ON</td><td>TIC-211 holds SP. Dew margin &gt; 3 bar</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">5</td><td>Wait for the reaction to die away</td><td class="tag">R-211</td><td class="c">&lt; 2 t/h</td><td>Heat of reaction ≈ 0</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="ph"><td colspan="9">PHASE C — Isolate chemicals and feeds</td></tr>
+<tr><td class="n">6</td><td>GPR routing to BYPASS</td><td class="tag">HS-302</td><td class="c">BYPASS</td><td>Powder routes to D-501</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">7</td><td>Hydrogen off: AIC-211 → MAN, OP 0 %</td><td class="tag">AIC-211</td><td class="c">0 %</td><td>H₂ flow FV-211 ≈ 0</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">8</td><td>Stop TEAL and donor pumps</td><td class="tag">P-102<br>P-103</td><td class="c">STOP</td><td>Both stopped</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">9</td><td>Feeds off: FIC-201 and FIC-212 → MAN, OP 0 %</td><td class="tag">FIC-201<br>FIC-212</td><td class="c">0 t/h</td><td>Both flows &lt; 0.3 t/h. PIC-211 holds pressure</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="hp"><td class="n hpl">HP</td><td colspan="8"><span class="hpbadge">HOLD POINT</span> <b>Hot standby reached.</b> Decision: <span class="chk">☐</span> park in hot standby (stop here, keep E-212 + K-211 + P-701) &nbsp; <span class="chk">☐</span> continue to full shutdown. Supervisor: ______________ Time: _____</td></tr>
+<tr class="ph"><td colspan="9">PHASE D — Empty the finishing section</td></tr>
+<tr><td class="n">10</td><td>Run the silo down: LIC-601 SP ≈ 5 %. At ≤ 10 % stop EX-601</td><td class="tag">LIC-601<br>EX-601</td><td class="c">≤ 10 %<br>STOP</td><td>Silo ≤ 10 %, extruder stopped (≈ 3 h from 50 %)</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">11</td><td>Steam to D-501 OFF</td><td class="tag">D-501</td><td class="c">OFF</td><td>Steam OFF</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="ph"><td colspan="9">PHASE E — Depressurise and stop the machines</td></tr>
+<tr><td class="n">12</td><td>PIC-211 SP → ≈ 3 barg (vent opens). At ≤ 5 barg stop E-212</td><td class="tag">PIC-211<br>E-212</td><td class="c">≤ 5 barg<br>OFF</td><td>Pressure falling; dew margin only increases</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">13</td><td>Stop K-211 and P-701 — <b>only</b> with production &lt; 1 t/h</td><td class="tag">K-211<br>P-701</td><td class="c">STOP</td><td>Both stopped. No CO kill. Session card COMPLETE</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">14</td><td>Isolations, LOTO and nitrogen blanketing for maintenance <span class="field f">FIELD</span></td><td class="tag">—</td><td class="c">per permit</td><td>Field confirms; permits issued</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr class="hp"><td class="n hpl">HP</td><td colspan="8"><span class="hpbadge">HOLD POINT</span> <b>Plant safely shut down</b> — total time ______ · SIS trips ____ · off-spec ____ t. Supervisor: ______________ Time: _____</td></tr>
+</table>
+</div>
+
+<!-- ===================== PAGE 6 — EMERGENCY ===================== -->
+<div class="sheet" data-t="SZ-CL-04 · Emergency Shutdown, Restart after a Trip, Hot Standby" data-s="Manual §8.5, §8.7 and chapter 9">
+<div class="box warn"><b style="font-size:11pt">IMMEDIATE ACTIONS — learn these by heart</b><br>
+Use when the reaction can no longer be held: TIC-211 OP at 100 % with T still rising · loss of P-701 or K-211 with the reaction running · T heading for 90 °C. The SIS does the same at <b>92 °C</b> or after <b>K-211 stopped 60 s</b> — acting earlier keeps more options open.
+<table class="t" style="margin-top:2mm">
+<tr><th>#</th><th style="text-align:left">Action</th><th>Tag</th><th style="text-align:left">Verify</th><th>✓</th><th>Time</th><th>Init</th></tr>
+<tr><td class="n">E1</td><td><b>Cut catalyst</b>: FIC-101 → MAN, OP 0 %</td><td class="tag">FIC-101</td><td>Catalyst flow 0</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">E2</td><td><b>Kill</b>: XV-901 ARM → INJECT</td><td class="tag">XV-901</td><td>State INJECTED; heat of reaction → 0 within ≈ 1 min</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">E3</td><td><b>Confirm</b>: TIC-211 OP falling, temperature turning down</td><td class="tag">TIC-211</td><td>T peak ____ °C at ____</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">E4</td><td><b>Make safe</b>: ethylene and H₂ → MAN 0 %; HECO: GPR → BYPASS; keep K-211 and P-701 running if available; if R-211 cools, start E-212</td><td class="tag">FIC-203<br>AIC-211<br>HS-302</td><td>Dew margin &gt; 3 bar</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">E4a</td><td><b>Check the flare</b> (Area 900): flare load, PSVs closed or relieving, D-901 level. Inform the field / control room of heavy flaring</td><td class="tag">FL-901</td><td>Peak flare ____ t/h; PSV lifted? Y / N</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">E5</td><td><b>Inform</b> shift supervisor; record the event in the log sheet event log</td><td class="tag">—</td><td>Supervisor informed at ____</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+</table></div>
+<h2>Cause of the trip</h2>
+<div class="fields c2"><div>First alarm (time / tag) <span class="fill"></span></div><div>SIS initiator <span class="fill"></span></div></div>
+<p class="small mut">Use the alarm list, event journal and trends — ask "what moved first?". Typical causes: P-701 trip, K-211 trip, catalyst ramp too fast, PIC-211 failure, extruder trip / silo HH, feed poisoning.</p>
+<div class="lines"><div></div><div></div></div>
+<p style="margin-top:2mm"><b>Decision:</b> &nbsp; <span class="chk">☐</span> Restart (below) &nbsp;&nbsp; <span class="chk">☐</span> Full shutdown — continue with SZ-CL-03 from step 6 &nbsp;&nbsp; Supervisor: ______________</p>
+<h2>Restart after a CO kill or SIS trip</h2>
+<table class="t">
+<tr><th>#</th><th style="text-align:left">Action</th><th>Tag</th><th style="text-align:left">Verify</th><th>✓</th><th>Time</th><th>Init</th></tr>
+<tr><td class="n">R1</td><td>Cause found and fixed (or failure cleared by instructor)</td><td class="tag">—</td><td>Recorded above</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">R2</td><td>XV-901 RESET → state PURGE; wait until NORMAL (15–30 min)</td><td class="tag">XV-901</td><td>State NORMAL</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">R3</td><td>If the silo cut the catalyst: reset the SIS catalyst cut (FIC-101 faceplate; silo &lt; 90 %)</td><td class="tag">FIC-101</td><td>No CATCUT alarm</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">R4</td><td>Hot standby conditions met: K-211/P-701 running, T ≥ 72 °C, P at SP, dew margin &gt; 3 bar</td><td class="tag">R-211</td><td>T ____ P ____ margin ____</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">R5</td><td>TEAL, donor, barrier, fresh C₃ and H₂ lined up (start-up steps 7–9)</td><td class="tag">—</td><td>All in AUTO at SP</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">R6</td><td>Light off again with start-up steps 10–14 (SZ-CL-02 page 4), including HOLD POINT 2</td><td class="tag">—</td><td>Production building</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+</table>
+<h2>Hot standby — park and restart</h2>
+<table class="t">
+<tr><th>#</th><th style="text-align:left">Action</th><th style="text-align:left">Verify</th><th>✓</th><th>Time</th><th>Init</th></tr>
+<tr><td class="n">S1</td><td>Park: shutdown steps 1–9 (SZ-CL-03), then stop. Keep E-212 on with TIC-211 in AUTO; PIC-211 at normal SP</td><td>T at SP, dew margin &gt; 3 bar, K-211 + P-701 running</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">S2</td><td>While parked, record T, P and dew margin every hour on the log sheet</td><td>No dew-margin alarm</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">S3</td><td>Restart: start-up steps 7–14 (SZ-CL-02). Check T ≥ 72 °C and margin &gt; 3 bar first</td><td>Production building; on-spec</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+</table>
+</div>
+
+<!-- ===================== PAGE 7 — REFERENCE & SIGN-OFF ===================== -->
+<div class="sheet" data-t="SZ-CL-05 · Setpoint Reference Card, Deviations and Sign-off" data-s="Values from manual §5, §6 and §8.4 — keep this page at the panel">
+<h2>Start-up and final setpoints by grade</h2>
+<table class="t">
+<tr><th style="text-align:left">Controller</th><th style="text-align:left">What it sets</th><th>H-RAFFIA</th><th>H-INJ</th><th>H-FIBER</th><th>H-BOPP</th><th>R-7</th><th>Step</th></tr>
+<tr><td class="tag">HIC-213</td><td>Solids circulation OP</td><td class="c" colspan="5">55 %</td><td class="c">3</td></tr>
+<tr><td class="tag">PIC-211</td><td>MZCR pressure</td><td class="c">28</td><td class="c">28</td><td class="c">28</td><td class="c">28</td><td class="c">27 barg</td><td class="c">5</td></tr>
+<tr><td class="tag">PIC-301</td><td>Flash pressure</td><td class="c" colspan="5">18 barg</td><td class="c">6</td></tr>
+<tr><td class="tag">Donor</td><td>External donor drum</td><td class="c">C</td><td class="c">C</td><td class="c">C</td><td class="c"><b>D</b></td><td class="c">C</td><td class="c">PSSR</td></tr>
+<tr><td class="tag">FFIC-102</td><td>TEAL / catalyst</td><td class="c" colspan="5">5 g/g</td><td class="c">7</td></tr>
+<tr><td class="tag">FFIC-103</td><td>TEAL / donor</td><td class="c">10</td><td class="c">10</td><td class="c">10</td><td class="c"><b>50</b></td><td class="c">10 g/g</td><td class="c">7</td></tr>
+<tr><td class="tag">FIC-212</td><td>Barrier liquid C₃</td><td class="c">6</td><td class="c">6</td><td class="c"><b>1.5</b></td><td class="c">6</td><td class="c">6 t/h</td><td class="c">8</td></tr>
+<tr><td class="tag">FIC-201</td><td>Fresh C₃ start-up → final</td><td class="c" colspan="5">5 → 22 t/h</td><td class="c">8 → 13</td></tr>
+<tr><td class="tag">AIC-211</td><td>Riser H₂ (mol%)</td><td class="c">0.97</td><td class="c">2.98</td><td class="c">2.36</td><td class="c">1.04</td><td class="c">1.75</td><td class="c">9</td></tr>
+<tr><td class="tag">FIC-101</td><td>Catalyst start-up → final (kg/h)</td><td class="c">0.2→0.62</td><td class="c">0.2→0.59</td><td class="c">0.2→0.60</td><td class="c">0.2→0.50</td><td class="c">0.2→0.70</td><td class="c">10 → 13</td></tr>
+<tr><td class="tag">TIC-211</td><td>MZCR temperature</td><td class="c">80</td><td class="c">80</td><td class="c">80</td><td class="c">80</td><td class="c">75 °C</td><td class="c">10</td></tr>
+<tr><td class="tag">FIC-203</td><td>Ethylene (RACO only)</td><td class="c">0</td><td class="c">0</td><td class="c">0</td><td class="c">0</td><td class="c">1167 kg/h</td><td class="c">13</td></tr>
+<tr><td class="tag">LIC-601</td><td>Silo level</td><td class="c" colspan="5">50 %</td><td class="c">12</td></tr>
+</table>
+<h2>Alarm and trip limits</h2>
+<table class="t">
+<tr><th style="text-align:left">Variable</th><th>Normal</th><th>Alarm</th><th>SIS trip / protection</th></tr>
+<tr><td>R-211 temperature TIC-211</td><td class="c lim">80 (R-7 75) °C</td><td class="c lim">H 85 · HH 90 · L 68</td><td class="c lim">≥ 92 °C → CO kill</td></tr>
+<tr><td>Dew-point margin Pvap − P</td><td class="c lim">&gt; 6 bar</td><td class="c lim">L 3 bar (P1)</td><td class="c lim">&lt; 0.5 bar → K-211 trip</td></tr>
+<tr><td>R-211 pressure PIC-211</td><td class="c lim">28 (27) barg</td><td class="c lim">H 31 · L 24</td><td class="c">—</td></tr>
+<tr><td>K-211 cycle-gas compressor</td><td class="c lim">RUN</td><td class="c lim">STOPPED (P1)</td><td class="c lim">stopped &gt; 60 s with reaction → CO kill</td></tr>
+<tr><td>Flash D-301 PIC-301</td><td class="c lim">18 barg</td><td class="c lim">H 20 · L 15</td><td class="c">—</td></tr>
+<tr><td>GPR temperature TIC-401</td><td class="c lim">75 °C</td><td class="c lim">H 83 · HH 90</td><td class="c lim">≥ 95 °C → CO kill</td></tr>
+<tr><td>Silo D-601 LIC-601</td><td class="c lim">30–70 %</td><td class="c lim">H 85 · HH 95 · L 10</td><td class="c lim">≥ 95 % → catalyst cut</td></tr>
+<tr><td>Start-up heater E-212</td><td class="c lim">start-up only</td><td class="c">—</td><td class="c lim">trips at 85 °C / no K-211</td></tr>
+</table>
+<h2>Deviation and open-item record</h2>
+<table class="t">
+<tr><th style="width:9mm">#</th><th style="width:16mm">Step</th><th style="text-align:left">Deviation / open item and reason</th><th style="width:30mm">Action / approved by</th><th style="width:14mm">Time</th></tr>
+<tr><td style="height:7mm"></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:7mm"></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:7mm"></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:7mm"></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:7mm"></td><td></td><td></td><td></td><td></td></tr>
+</table>
+<h2>Final sign-off</h2>
+<div class="fields c3">
+<div>Procedure <span class="chk">☐</span>Start-up <span class="chk">☐</span>Shutdown</div><div>Completed at <span class="fill"></span></div><div>Total time <span class="fill"></span></div>
+<div>Off-spec made (t) <span class="fill"></span></div><div>SIS trips <span class="fill"></span></div><div>Sim score <span class="chk">☐</span>EASY <span class="chk">☐</span>HARD</div>
+</div>
+<div class="sig"><div><b>Panel operator</b>Name / signature</div><div><b>Shift supervisor</b>Name / signature</div><div><b>Trainer / assessor</b>Name / signature / result</div></div>
+</div>
+
+<script>
+// document header and footer on every sheet (number of pages counted automatically)
+(function () {
+  const b = document.body, sheets = [...document.querySelectorAll('.sheet')];
+  sheets.forEach((s, i) => {
+    const hd = document.createElement('table'); hd.className = 'dh';
+    hd.innerHTML = '<tr><td class="org">SPHERIZONE PP PLANT<small>' + b.dataset.unit + '</small></td><td class="ttl">' + s.dataset.t + '<small>' + (s.dataset.s || '') + '</small></td>' +
+      '<td class="meta"><div><span>Doc no.</span><b>' + b.dataset.doc + '</b></div><div><span>Revision</span><b>' + b.dataset.rev + '</b></div><div><span>Page</span><b>' + (i + 1) + ' of ' + sheets.length + '</b></div></td></tr>';
+    s.prepend(hd);
+    const ft = document.createElement('div'); ft.className = 'foot';
+    ft.innerHTML = '<span>' + b.dataset.doc + ' rev ' + b.dataset.rev + ' · Training document — not licensor data · Uncontrolled when printed</span><span>Page ' + (i + 1) + ' of ' + sheets.length + '</span>';
+    s.append(ft);
+  });
+})();
+</script>
+</body>
+</html>

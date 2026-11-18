@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — 200 MZCR</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="mzcr">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+UI.page({
+  defaultTag: 'TIC-211',
+  side: ['kpi', 'trend:temps', 'trend:h2'],
+  draw(d) {
+    d.label(20, 28, 'AREA 200 — MULTIZONE CIRCULATING REACTOR R-211', 'lbl big');
+    // ---- reactor body: separator, riser, downer, bottom leg
+    d.rect(420, 60, 155, 62, 'eq', 10); d.label(497, 88, 'TOP SEPARATOR', 'lbl s', 'middle');
+    d.rect(420, 120, 40, 420, 'eq'); d.rect(520, 120, 55, 420, 'eq'); d.rect(420, 530, 155, 26, 'eq', 6);
+    d.rect(526, 165, 43, 362, 'bed');
+    d.rect(520, 140, 55, 22, 'eq2'); d.label(547, 155, 'STRIP', 'lbl s', 'middle');
+    const rl = d.label(440, 330, 'RISER — fast fluidisation · high H2', 'lbl s', 'middle'); rl.setAttribute('transform', 'rotate(-90 440 330)');
+    const dl = d.label(547, 345, 'DOWNER — packed plug flow · low H2', 'lbl s', 'middle'); dl.setAttribute('transform', 'rotate(-90 547 345)');
+    d.label(497, 112, 'R-211', 'lbl', 'middle');
+    // solids circulation animation (riser up, downer down)
+    const pg = document.createElementNS('http://www.w3.org/2000/svg', 'g'); pg.setAttribute('class', 'particles'); d.layer.eq.appendChild(pg);
+    const mk = (x, y0, y1, dur, beg) => { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('cx', x); c.setAttribute('r', 2.6);
+      c.innerHTML = `<animate attributeName="cy" from="${y0}" to="${y1}" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/>`; pg.appendChild(c); return c; };
+    for (let i = 0; i < 10; i++) { mk(428 + (i % 3) * 12, 528, 128, 3, -i * 0.3); mk(533 + (i % 3) * 13, 168, 525, 7, -i * 0.7); }
+    UI.bind(pg, (S) => { const run = S.eq.K211 && S.ctl['HIC-213'].op > 2 && !S.frozen; pg.style.display = run ? '' : 'none'; });
+
+    // ---- cycle gas: separator → K-211 → E-211 → riser bottom
+    d.pipe([[497, 60], [497, 40], [300, 40], [300, 72]], 'gas');
+    d.motor(300, 90, 'K211', 'comp', '');
+    d.label(330, 94, 'K-211', 'lbl');
+    d.pipe([[300, 106], [300, 162]], 'gas');
+    d.hx(300, 180, ''); d.label(326, 184, 'E-211', 'lbl');
+    d.pipe([[300, 196], [300, 540], [418, 540]], 'gas');
+    d.motor(300, 250, 'HTR', 'heat', '');
+    d.label(320, 248, 'E-212', 'lbl');
+    d.dyn(320, 261, S => S.eq.HTR ? 'heater ON ' + fx(S.p.Qh, 0) + ' MW' : 'start-up htr', 'lbl s');
+    d.label(306, 300, 'cycle gas', 'lbl s');
+    // ---- cooling water + TIC-211
+    d.motor(180, 270, 'P701', 'pump', 'P-701');
+    d.pipe([[194, 270], [240, 270], [240, 180], [282, 180]], 'cw');
+    d.valve(240, 225, 'TIC-211', true, 'TV');
+    d.tag(100, 150, 'TIC-211');
+    d.dyn(60, 284, S => 'CW ret ' + fx(S.p.cwT, 1) + ' °C', 'lbl s');
+    // ---- feeds into cycle-gas line
+    const feeds = [['FIC-201', 'Fresh C3'], ['PIC-211', 'C3 make-up'], ['AIC-211', 'Hydrogen'], ['FIC-203', 'Ethylene (RACO)']];
+    feeds.forEach(([tag, lab], i) => { const y = 350 + 62 * i; d.pipe([[20, y], [298, y]], i === 2 ? 'gas thin' : 'liq'); d.valve(220, y, tag, false); d.tag(30, y - 50, tag); d.label(156, y - 11, lab, 'lbl s'); });
+    // ---- catalyst inlet
+    d.link(20, 600, 'FROM R-101 (100)', 'catalyst.html#FIC-101', 'l');
+    d.pipe([[150, 600], [440, 600], [440, 558]], 'cat');
+    d.label(250, 594, 'prepolymerised catalyst', 'lbl s');
+    // ---- solids circulation hand station on the bottom leg
+    d.valve(497, 543, 'HIC-213', false);
+    d.tag(470, 590, 'HIC-213');
+    // ---- barrier liquid propylene into stripping zone
+    d.pipe([[780, 150], [577, 150]], 'liq');
+    d.valve(660, 150, 'FIC-212', false);
+    d.tag(610, 90, 'FIC-212');
+    d.label(690, 144, 'Liquid C3 barrier', 'lbl s');
+    // ---- polymer discharge to flash
+    d.pipe([[575, 545], [650, 545]], '');
+    d.link(652, 545, 'TO D-301 FLASH (300)', 'flash.html#PIC-301', 'r');
+    d.tag(610, 200, 'PIC-211');
+    d.ind(610, 260, 'PI-211 / Pvap', S => fx(S.p.P211, 1) + ' / ' + fx(S.p.pvap - 1.013, 1), 'barg', 1, 150, 'PIC-211');
+    d.ind(610, 300, 'Dew-point margin', S => S.p.dew, 'bar', 2, 150, 'PIC-211');
+
+    // ---- PSV-211 on the top separator → flare header (Area 900)
+    d.pipe([[575, 75], [590, 75], [590, 57]], 'thin', { noArrow: true });
+    const o211 = d.psv(590, 45, 'PSV-211', 'r');
+    const f211 = d.pipe([[o211.x, o211.y], [680, o211.y]], 'flare', { noArrow: true });
+    UI.bind(f211, (S) => f211.classList.toggle('hot', !!(S.psv && S.psv['PSV-211'] && S.psv['PSV-211'].open)));
+    d.link(682, o211.y, 'TO FLARE (900)', 'utilities.html#PSV-211', 'r');
+
+    // ---- CO kill panel
+    d.ind(800, 60, 'XV-901 CO KILL', S => S.sis.kill, '', 0, 180, 'XV-901');
+    d.btn(990, 64, 46, () => 'ARM', () => SZ.cmd({ type: 'kill', a: 'ARM' }), S => S.sis.kill === 'ARMED');
+    d.btn(1040, 64, 52, () => 'INJECT', () => SZ.cmd({ type: 'kill', a: 'INJECT' }), S => S.sis.kill === 'INJECTED');
+    d.btn(1096, 64, 48, () => 'RESET', () => SZ.cmd({ type: 'kill', a: 'RESET' }), S => S.sis.kill === 'PURGE');
+    d.btn(1148, 64, 42, () => 'DIS', () => SZ.cmd({ type: 'kill', a: 'DISARM' }));
+    d.dyn(800, 108, S => S.sis.bypass ? 'SIS BYPASSED — no automatic trip!' : 'SIS: TZHH-211 92 °C · K-211 stop > 60 s → CO kill', 'lbl s');
+    d.dyn(800, 122, S => S.sis.k211StopT > 0 ? 'K-211 stopped ' + fx(S.sis.k211StopT, 0) + ' s' : '', 'lbl s');
+
+    // ---- process indicator matrix
+    const c1 = [
+      ['R-211 production', S => S.p.rMZ, 't/h', 1], ['Riser H2 (true)', S => S.p.H2r, 'mol%', 2], ['Downer H2 AI-212', S => S.p.H2d, 'mol%', 3],
+      ['Barrier efficiency', S => S.p.barEff * 100, '%', 1], ['Heat of reaction', S => S.p.Qr, 'MW', 2], ['E-211 duty', S => S.p.Qc, 'MW', 2],
+      ['Feed vaporisation', S => S.p.Qf, 'MW', 2], ['Catalyst holdup', S => S.p.hold, 'kg', 3], ['Fouling index', S => S.p.foul, '%', 1]];
+    const c2 = [
+      ['MFR riser zone', S => S.p.MFRr, 'g/10', 2], ['MFR downer zone', S => S.p.MFRd, 'g/10', 2], ['MFR MZCR (log-blend)', S => S.p.mfrMZ, 'g/10', 2],
+      ['PI Mw/Mn inst', S => S.p.inst.PI, '', 2], ['XS inst', S => S.p.xsMZ, 'wt%', 2], ['C2 inst', S => S.p.inst.C2, 'wt%', 2],
+      ['Stickiness margin', S => -S.p.sticky, 'wt%', 2], ['Make-up / vent', S => fx(S.p.Fmk, 1) + ' / ' + fx(S.p.Fvent || 0, 1), 't/h', 1], ['H2 flow FV-211', S => S.p.H2f, 'kg/h', 2]];
+    c1.forEach((r, i) => d.ind(800, 150 + i * 40, r[0], r[1], r[2], r[3], 185));
+    c2.forEach((r, i) => d.ind(1000, 150 + i * 40, r[0], r[1], r[2], r[3], 190));
+  }
+});
+</script>
+</body>
+</html>

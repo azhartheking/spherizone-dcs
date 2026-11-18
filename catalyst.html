@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — 100 Catalyst</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="catalyst">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+UI.page({
+  defaultTag: 'FIC-101',
+  side: ['kpi', 'trend:cat'],
+  draw(d) {
+    d.label(20, 28, 'AREA 100 — CATALYST FEED, PRECONTACT & PREPOLYMERISATION', 'lbl big');
+    // storage drums
+    d.vessel(80, 70, 60, 110, 'D-101', 'ZN catalyst (Avant ZN) MgCl2/TiCl4 + ID');
+    d.vessel(300, 70, 60, 110, 'D-102', 'TEAL co-catalyst');
+    d.pipe([[360, 95], [372, 95], [372, 62]], 'thin', { noArrow: true });
+    const o102 = d.psv(372, 50, 'PSV-102', 'r');
+    d.pipe([[o102.x, o102.y], [440, o102.y]], 'flare'); d.label(444, o102.y + 3, 'to flare', 'lbl s');
+    d.vessel(520, 70, 60, 110, 'D-103', 'External donor (silane)');
+    d.dyn(550, 132, S => S.donor, 'lbl big', 'middle');
+    d.btn(600, 76, 70, () => 'C-donor', () => SZ.cmd({ type: 'donor', v: 'C' }), S => S.donor === 'C');
+    d.btn(600, 104, 70, () => 'D-donor', () => SZ.cmd({ type: 'donor', v: 'D' }), S => S.donor === 'D');
+    // dosing
+    d.pipe([[110, 180], [110, 228]], 'cat', { noArrow: true });
+    d.motor(110, 242, 'CATF', 'pump', ''); d.label(110, 275, 'Feeder', 'lbl s', 'middle');
+    d.pipe([[330, 180], [330, 228]], 'cat', { noArrow: true });
+    d.motor(330, 242, 'TEALP', 'pump', ''); d.label(330, 275, 'P-102', 'lbl s', 'middle');
+    d.pipe([[550, 180], [550, 228]], 'cat', { noArrow: true });
+    d.motor(550, 242, 'DONP', 'pump', ''); d.label(550, 275, 'P-103', 'lbl s', 'middle');
+    d.tag(142, 214, 'FIC-101'); d.tag(362, 214, 'FFIC-102'); d.tag(582, 214, 'FFIC-103');
+    d.pipe([[110, 256], [110, 300], [305, 300], [305, 328]], 'cat');
+    d.pipe([[330, 256], [330, 328]], 'cat');
+    d.pipe([[550, 256], [550, 300], [355, 300], [355, 328]], 'cat');
+    // precontact + prepoly
+    d.vessel(290, 330, 80, 80, 'D-104 precontact pot', '~15 °C · τ ≈ 10 min');
+    d.pipe([[370, 370], [518, 370]], 'cat');
+    d.vessel(520, 340, 80, 130, 'R-101 prepolymeriser', '~20 °C · τ ≈ 20 min');
+    d.pipe([[40, 520], [480, 520], [480, 440], [518, 440]], 'liq'); d.label(44, 512, 'Liquid C3 (slip-stream)', 'lbl s');
+    d.ind(390, 400, 'TI-104', S => S.p.T104, '°C', 1, 90);
+    d.ind(620, 360, 'TI-101', S => S.p.T101, '°C', 1, 90);
+    d.pipe([[600, 410], [700, 410]], 'cat');
+    d.link(702, 410, 'TO R-211 RISER (200)', 'mzcr.html#AIC-211', 'r');
+    // feed poison analyser
+    d.ind(40, 560, 'AI-001 H2O', S => S.poison.H2O, 'ppm', 2, 110, 'AI-001');
+    d.ind(160, 560, 'AI-001 CO', S => S.poison.CO, 'ppm', 2, 110, 'AI-001');
+    d.ind(280, 560, 'AI-001 COS', S => S.poison.COS, 'ppm', 2, 110, 'AI-001');
+    d.label(40, 552, 'Propylene feed impurities (consume TEAL, then poison catalyst)', 'lbl s');
+    // live calculation column
+    const X1 = 900, X2 = 1050;
+    d.label(X1, 70, 'CATALYST SYSTEM — ACTUAL', 'lbl');
+    const rows = [
+      ['TEAL flow', S => S.p.teal, 'kg/h', 2], ['Donor flow', S => S.p.donor, 'kg/h', 3],
+      ['Al/Ti eff. (TEAL/cat)', S => S.p.tealRatioAct, 'g/g', 2], ['TEAL/donor in R-211', S => S.p.donRatioAct, 'g/g', 1],
+      ['D-donor fraction', S => S.p.fracD * 100, '%', 0], ['Poison TEAL demand', S => (S.p.F201 + S.p.F212 + S.p.Fmk) * (S.poison.H2O + 1.5 * S.poison.COS) * 0.006, 'kg/h', 2],
+      ['Poison effect', S => S.p.poisonEff * 100, '%', 1], ['Cat. into R-211', S => S.p.c2, 'kg/h', 3],
+      ['Cat. holdup R-211', S => S.p.hold, 'kg', 3], ['Mileage', S => S.p.mileage, 't/kg', 1]
+    ];
+    rows.forEach((r, i) => d.ind(i % 2 ? X2 : X1, 82 + Math.floor(i / 2) * 40, r[0], r[1], r[2], r[3], 140));
+    d.label(X1, 300, 'Catalyst plug check: compare FIC-101 PV with', 'lbl s');
+    d.label(X1, 313, 'production / mileage and prepoly T trend.', 'lbl s');
+  },
+  panels(pn) {
+    const c = UI.card('Catalyst chemistry (from LYB catalyst booklet)');
+    c.querySelector('.bd').innerHTML = `<div class="hint" style="line-height:1.5">
+      • <b>TEAL</b> (Al-alkyl) activates Ti sites and scavenges H2O / COS / O2 in the feed — low TEAL/cat ratio loses activity.<br>
+      • <b>External donor</b> (dialkyldimethoxysilane: C-, D-donor) sets stereo-regularity: lower TEAL/donor → lower XS but lower activity.<br>
+      • <b>C-donor</b>: stronger H2 response, narrower MWD. <b>D-donor</b>: weaker H2 response, broader MWD — used for BOPP (PI ≥ 5).<br>
+      • Donor changes reach R-211 only after precontact + prepoly + reactor residence (~1 h) — plan grade changes.</div>`;
+    pn.append(c);
+  }
+});
+</script>
+</body>
+</html>

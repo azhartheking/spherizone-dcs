@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — 500 Finishing & Silo</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="finishing">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+UI.page({
+  defaultTag: 'LIC-601',
+  side: ['kpi', 'trend:silo'],
+  draw(d) {
+    d.label(20, 28, 'AREA 500/600 — STEAMING, DRYING, POWDER SILO & EXTRUSION', 'lbl big');
+    d.link(20, 120, 'FROM GPR / D-301', 'gpr.html#LIC-401', 'l');
+    d.pipe([[150, 120], [245, 120], [245, 138]], '');
+    d.vessel(200, 140, 90, 200, 'D-501 steamer / dryer', 'steam deactivates catalyst · N2 dries');
+    d.pipe([[280, 146], [280, 132]], 'thin', { noArrow: true });
+    const o501 = d.psv(280, 120, 'PSV-501', 'r');
+    d.pipe([[o501.x, o501.y], [330, o501.y], [330, 100]], 'thin'); d.label(336, 104, 'to atmosphere', 'lbl s');
+    d.ind(207, 200, 'Powder in', S => S.p.D501in, 't/h', 1, 76);
+    d.label(90, 236, 'Steam', 'lbl s'); d.pipe([[60, 250], [198, 250]], 'gas thin');
+    d.btn(60, 262, 110, S => S.eq.STEAM ? 'STEAM ON' : 'STEAM OFF', () => SZ.cmd({ type: 'motor', eq: 'STEAM', on: !SZ.rt.S.eq.STEAM }), S => S.eq.STEAM);
+    d.label(90, 316, 'N2 drying', 'lbl s'); d.pipe([[60, 326], [198, 326]], 'gas thin');
+    d.pipe([[245, 340], [245, 400], [420, 400], [420, 100], [540, 100], [540, 108]], '');
+    d.label(300, 394, 'pneumatic conveying', 'lbl s');
+    d.vessel(480, 110, 120, 300, 'D-601 powder silo', '400 t');
+    d.level(490, 130, 100, 260, S => S.p.siloLvl);
+    d.ind(495, 140, 'LI-601', S => S.p.siloLvl, '%', 1, 90, 'LIC-601');
+    d.tag(640, 200, 'LIC-601');
+    d.pipe([[540, 410], [540, 470], [718, 470]], '');
+    d.motor(760, 470, 'EX601', 'ext', '');
+    d.label(760, 500, 'EX-601 extruder / pelletiser', 'lbl', 'middle');
+    d.link(856, 508, 'DETAIL: 600 EXTRUSION', 'extrusion.html#LIC-601', 'r');
+    d.pipe([[760, 560], [760, 486]], 'cat'); d.label(768, 556, 'Additives (AO, AS, NUC/clarifier, antistatic, slip)', 'lbl s');
+    d.pipe([[802, 470], [1000, 470]], '');
+    d.label(840, 462, 'Pellets → blending / bagging', 'lbl s');
+    const rows = [['Silo inventory', S => S.p.silo, 't', 0], ['Silo residence', S => S.p.exRate > 1 ? S.p.silo / S.p.exRate : 0, 'h', 1],
+      ['Extruder rate', S => S.p.exRate, 't/h', 1], ['Pellets', S => S.p.pelOk ? 'ON-SPEC' : 'OFF-SPEC', '', 0],
+      ['On-spec total', S => S.tons.on, 't', 1], ['Off-spec total', S => S.tons.off, 't', 1], ['Production', S => S.p.prodTot, 't/h', 1]];
+    rows.forEach((r, i) => d.ind(880 + (i % 2) * 160, 100 + Math.floor(i / 2) * 44, r[0], r[1], r[2], r[3], 150, r[0] === 'Pellets' ? 'LAB' : null));
+  },
+  panels(pn) {
+    const c = UI.card('Additive dosing — EX-601', ' <a href="quality.html">recipe →</a>');
+    const names = { AO: 'Antioxidant', AS: 'Acid scavenger', NUC: 'Nucleator / clarifier', AST: 'Antistatic', SLIP: 'Slip / antiblock' };
+    const tb = UI.h('table', { class: 't' }); tb.innerHTML = '<tr><th class="l">Additive</th><th>Recipe ppm</th><th>Actual ppm</th><th></th></tr>';
+    for (const k in names) {
+      const tr = UI.h('tr'); const rc = UI.h('td'), inp = UI.h('input', { type: 'number', step: 50 }), tdI = UI.h('td'); tdI.append(inp);
+      const b = UI.h('button', { on: { click: () => SZ.cmd({ type: 'add', k, v: +inp.value }) } }, 'Set'); const tdB = UI.h('td'); tdB.append(b);
+      tr.append(UI.h('td', { class: 'l' }, names[k]), rc, tdI, tdB); tb.append(tr);
+      UI.bind(tr, (S) => { const t = SZ.GRADES[S.target].add[k], hard = S.level === 'hard'; rc.textContent = hard ? '— (manual)' : t; if (document.activeElement !== inp) inp.value = S.add[k];
+        const off = Math.abs(S.add[k] - t) > Math.max(50, 0.1 * t); tdI.className = off && !hard ? 'diff' : ''; });
+    }
+    c.querySelector('.bd').append(tb, UI.h('div', { class: 'hint' }, 'Additive package > ±10 % from the target recipe makes pellets off-spec.'));
+    pn.append(c);
+    const c2 = UI.card('Pellet properties vs target spec', ' <a href="quality.html">lab →</a>');
+    const t2 = UI.h('table', { class: 't' }); c2.querySelector('.bd').append(t2);
+    UI.bind(t2, (S) => {
+      const g = SZ.GRADES[S.target]; let html = '<tr><th class="l">Property</th><th>Inst.</th><th>Pellet</th><th>Spec</th></tr>';
+      for (const k in SZ.PROPS) { const P = SZ.PROPS[k], sp = g.spec[k], v = S.p.pel[k], bad = sp && (v < sp[0] || v > sp[1]);
+        html += `<tr><td class="l">${P.label} ${P.unit}</td><td>${fx(S.p.inst[k], P.dec)}</td><td class="${bad ? 'bad' : ''}">${fx(v, P.dec)}</td><td>${sp ? (sp[0] + ' – ' + (sp[1] >= 99 ? '∞' : sp[1])) : ''}</td></tr>`; }
+      t2.innerHTML = html;
+    });
+    pn.append(c2);
+  }
+});
+</script>
+</body>
+</html>

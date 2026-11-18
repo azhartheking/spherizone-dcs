@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — Instructor</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="instructor">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx, h = UI.h;
+UI.page({
+  graphic: false, faceplate: false, side: ['kpi', 'trend:prod'],
+  body(view) {
+    const grid = h('div', { class: 'panels' }); view.append(grid);
+
+    // ---- failures
+    const fc = UI.card('Equipment & instrument failures');
+    const fg = h('div', { class: 'fail-grid' });
+    for (const k in SZ.FAILS) {
+      const b = h('button', { on: { click: () => SZ.cmd({ type: 'fail', name: k, on: !SZ.rt.S.fail[k], src: 'INSTRUCTOR' }) } });
+      UI.bind(b, (S) => { b.textContent = S.fail[k] ? 'ACTIVE — clear' : 'Activate'; b.classList.toggle('warn', S.fail[k]); });
+      fg.append(h('span', {}, SZ.FAILS[k]), b);
+    }
+    fc.querySelector('.bd').append(fg, h('div', { class: 'tabs', style: 'margin-top:8px' }));
+    fc.querySelector('.tabs').append(h('button', { on: { click: () => SZ.cmd({ type: 'clearFails', src: 'INSTRUCTOR' }) } }, 'Clear all failures'),
+      h('button', { on: { click: () => SZ.cmd({ type: 'resetFoul', src: 'INSTRUCTOR' }) } }, 'Reset fouling / chunks'));
+    grid.append(fc);
+
+    // ---- poisons + SIS
+    const pc = UI.card('Feed poisons & SIS');
+    const pb = pc.querySelector('.bd');
+    [['H2O', 10], ['CO', 3], ['COS', 10]].forEach(([k, max]) => {
+      const r = h('input', { type: 'range', min: 0, max, step: 0.1, style: 'width:100%' }), v = h('span', { class: 'v' });
+      r.addEventListener('change', () => SZ.cmd({ type: 'poison', k, v: +r.value, src: 'INSTRUCTOR' }));
+      UI.bind(r, (S) => { if (document.activeElement !== r) r.value = S.poison[k]; v.textContent = fx(S.poison[k], 1) + ' ppm'; });
+      const row = h('div', { class: 'kv', style: 'grid-template-columns:44px 1fr 70px;margin-bottom:4px' }); row.append(h('span', { class: 'k' }, k), r, v); pb.append(row);
+    });
+    const sb = h('button', { on: { click: () => SZ.cmd({ type: 'sisBypass', on: !SZ.rt.S.sis.bypass, src: 'INSTRUCTOR' }) } });
+    UI.bind(sb, (S) => { sb.textContent = S.sis.bypass ? 'SIS BYPASSED — restore' : 'Bypass SIS'; sb.classList.toggle('warn', S.sis.bypass); });
+    const sr = h('button', { on: { click: () => SZ.cmd({ type: 'sisReset', src: 'INSTRUCTOR' }) } }, 'Reset catalyst cut');
+    const kr = h('button', { on: { click: () => SZ.cmd({ type: 'kill', a: 'RESET', src: 'INSTRUCTOR' }) } }, 'Reset CO kill → purge');
+    const t = h('div', { class: 'tabs', style: 'margin-top:8px' }); const nb = h('button', { title: 'Small random drifts and measurement noise, like a real plant', on: { click: () => SZ.cmd({ type: 'noise', on: SZ.rt.S.noiseOn === false, src: 'INSTRUCTOR' }) } });
+    UI.bind(nb, (S) => { nb.textContent = S.noiseOn === false ? 'Process noise OFF — turn on' : 'Process noise ON — turn off'; nb.classList.toggle('warn', S.noiseOn === false); });
+    t.append(sb, sr, kr, nb); pb.append(t);
+    pb.append(UI.kv([['SIS status', S => S.sis.bypass ? 'BYPASSED' : 'NORMAL', '', 0, S => S.sis.bypass], ['CO kill', S => S.sis.kill, '', 0, S => S.sis.kill !== 'NORMAL'],
+      ['Last trip demand', S => S.sis.lastTrip || '—', '', 0]]));
+    grid.append(pc);
+
+    // ---- init / snapshot
+    const ic = UI.card('Initialise & snapshots');
+    const ib = ic.querySelector('.bd');
+    const sel = h('select'); for (const g in SZ.GRADES) sel.append(h('option', { value: g }, g));
+    const ri = h('button', { class: 'warn', on: { click: () => { if (confirm('Re-initialise the plant at steady state on ' + sel.value + '? Current state is lost.')) SZ.cmd({ type: 'reinit', grade: sel.value }); } } }, 'Re-initialise at steady state');
+    const r1 = h('div', { class: 'tabs' }); r1.append(sel, ri);
+    const r2 = h('div', { class: 'tabs', style: 'margin-top:6px' });
+    r2.append(h('button', { on: { click: () => SZ.cmd({ type: 'snapSave' }) } }, 'Save snapshot'), h('button', { on: { click: () => { if (confirm('Restore saved snapshot?')) SZ.cmd({ type: 'snapRestore' }); } } }, 'Restore snapshot'));
+    const r0 = h('div', { class: 'tabs', style: 'margin-bottom:6px' });
+    r0.append(h('button', { on: { click: () => UI.sessionMenu(true) } }, '☰ Session menu — normal / drills / start-up / shutdown'),
+      h('button', { on: { click: () => { if (confirm('Initialise the plant COLD (all equipment stopped) for a start-up on ' + sel.value + '?')) SZ.cmd({ type: 'session', mode: 'startup', grade: sel.value }); } } }, 'Initialise cold (start-up)'));
+    ib.append(r0, r1, h('div', { class: 'hint' }, 'Initialisation settles the model silently for ~4 h sim time.'), r2);
+    grid.append(ic);
+
+    // ---- alarm sound test
+    const ac = UI.card('Alarm sounds');
+    const ar = h('div', { class: 'tabs' });
+    [[1, 'Test P1 (warble)'], [2, 'Test P2 (double beep)'], [3, 'Test P3 (chime)']].forEach(([p, l]) => ar.append(h('button', { on: { click: () => UI.audio.test(p) } }, l)));
+    const tg = h('button', { on: { click: () => UI.audio.toggle() } }); UI.bind(tg, () => { tg.textContent = UI.audio.on ? 'Sound is ON — turn off' : 'Sound is OFF — turn on'; tg.classList.toggle('warn', !UI.audio.on); });
+    ar.append(h('button', { on: { click: () => UI.audio.testHiss() } }, 'Test PSV relief (kshhh)'), h('button', { on: { click: () => UI.audio.testRoar() } }, 'Test flare roar'), tg);
+    ac.querySelector('.bd').append(ar, h('div', { class: 'hint', style: 'margin-top:6px' }, 'P1 repeats every 1.4 s and P2 every 4 s until acknowledged or silenced; P3 chimes once. Browsers only allow sound after you have clicked somewhere on the page.'));
+    grid.append(ac);
+
+    // ---- hidden truth (instructor only)
+    const tc = UI.card('Instructor view — true vs measured');
+    tc.querySelector('.bd').append(UI.kv([
+      ['Catalyst real / meter', S => fx(S.p.catAct, 3) + ' / ' + fx(S.p.catMeas, 3), 'kg/h', 3, S => Math.abs(S.p.catAct - S.p.catMeas) > 0.02],
+      ['Riser H2 true / GC', S => fx(S.p.H2r, 2) + ' / ' + fx(S.p.H2gc, 2), 'mol%', 2, S => Math.abs(S.p.H2r - S.p.H2gc) > 0.1],
+      ['LV-401 actual / LIC OP', S => fx(S.p.lv401, 0) + ' / ' + fx(S.ctl['LIC-401'].op, 0), '%', 0, S => Math.abs(S.p.lv401 - S.ctl['LIC-401'].op) > 2],
+      ['PIC-211 OP', S => S.ctl['PIC-211'].op, '%', 1], ['Active exercise', S => S.exercise ? S.exercise.title : '—', '', 0],
+      ['Scheduled events', S => S.sched.filter(x => !x.done).map(x => SZ.FAILS[x.fail] + ' @ ' + SZ.fmtT(x.t)).join(', ') || '—', '', 0]
+    ]));
+    grid.append(tc);
+
+    // ---- exercises
+    const ec = UI.card('Training exercises');
+    const eb = ec.querySelector('.bd');
+    for (const ex of SZ.EXERCISES) {
+      const d = h('div', { class: 'ex' });
+      d.append(h('b', {}, ex.title), h('p', {}, ex.brief), h('button', { on: { click: () => { if (confirm('Start exercise "' + ex.title + '"? The plant is re-initialised.')) SZ.cmd({ type: 'exercise', id: ex.id }); } } }, 'Start exercise'));
+      eb.append(d);
+    }
+    view.append(ec);
+  }
+});
+</script>
+</body>
+</html>

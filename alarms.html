@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — Alarms & Journal</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="alarms">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+let jf = 'ALL';
+UI.page({
+  graphic: false, side: ['kpi', 'trend:temps'],
+  body(view) {
+    const c = UI.card('Alarm summary', ' <span class="hint">P1 red · P2 amber · P3 magenta · blinking = unacknowledged · click a row to go to the tag</span>');
+    const tb = UI.h('table', { class: 't' }); c.querySelector('.bd').append(tb);
+    if (!UI.isPop) c.querySelector('h3').append(UI.h('button', { title: 'Open the alarm list in its own window (second screen / split screen)', on: { click: () => UI.popout('alarms', '', 1000, 620) } }, '⧉ Pop out'));
+    UI.bind(tb, (S) => {
+      const list = S.alarms.slice().sort((a, b) => (a.prio - b.prio) || (b.t - a.t));
+      tb.innerHTML = '<tr><th>Pri</th><th>Time</th><th class="l">Tag</th><th class="l">Message</th><th>State</th><th>Area</th><th></th></tr>' +
+        (list.length ? list.map(a => `<tr class="alm-row clk p${a.prio}${a.acked ? '' : ' unack'}${a.active ? '' : ' rtn'}" data-tag="${a.tag}" data-id="${a.id}"><td>P${a.prio}</td><td>${SZ.fmtT(a.t)}</td><td class="l"><b>${a.tag}</b></td><td class="l" style="white-space:normal">${a.msg}</td><td>${a.active ? (a.acked ? 'ACK' : 'UNACK') : 'RTN-UNACK'}</td><td>${(UI.PAGES.find(p => p[0] === a.page) || ['', ''])[1]}</td><td><button data-ack="${a.id}">ACK</button></td></tr>`).join('')
+          : '<tr><td colspan="7" class="l hint">No alarms.</td></tr>');
+    });
+    tb.addEventListener('click', (e) => { const b = e.target.closest('button[data-ack]'); if (b) { SZ.cmd({ type: 'ack', id: b.dataset.ack }); e.stopPropagation(); return; }
+      const r = e.target.closest('tr[data-tag]'); if (r) UI.go(r.dataset.tag); });
+    view.append(c);
+
+    const j = UI.card('Event journal', '');
+    const f = UI.h('div', { class: 'tabs' });
+    ['ALL', 'OPERATOR', 'INSTRUCTOR', 'ALARM', 'RTN', 'SIS'].forEach(k => { const b = UI.h('button', { on: { click: () => jf = k } }, k); UI.bind(b, () => b.classList.toggle('on', jf === k)); f.append(b); });
+    const jt = UI.h('table', { class: 't', style: 'margin-top:6px' });
+    j.querySelector('.bd').append(f, jt);
+    UI.bind(jt, (S) => {
+      const list = S.journal.filter(x => jf === 'ALL' || x.src === jf).slice(0, 200);
+      jt.innerHTML = '<tr><th>Time</th><th class="l">Source</th><th class="l">Event</th></tr>' + list.map(x => `<tr><td>${SZ.fmtT(x.t)}</td><td class="l">${x.src}</td><td class="l" style="white-space:normal">${x.msg}</td></tr>`).join('');
+    });
+    view.append(j);
+  }
+});
+</script>
+</body>
+</html>

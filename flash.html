@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — 300 Flash</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="flash">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+UI.page({
+  defaultTag: 'PIC-301',
+  side: ['kpi', 'trend:press'],
+  draw(d) {
+    d.label(20, 28, 'AREA 300 — HP FLASH, MONOMER RECOVERY & GPR ROUTING', 'lbl big');
+    // inlet: steam-jacketed flash line
+    d.link(20, 250, 'FROM R-211 (200)', 'mzcr.html#TIC-211', 'l');
+    d.pipe([[150, 250], [498, 250]], '');
+    d.label(200, 240, 'steam-jacketed flash line', 'lbl s');
+    d.ind(200, 270, 'Polymer + gas in', S => S.p.rMZ, 't/h PP', 1, 140);
+    // flash drum
+    d.vessel(500, 150, 120, 220, 'D-301 HP flash / cyclone', '~18 barg');
+    d.ind(510, 230, 'PI-301', S => S.p.P301, 'barg', 2, 100, 'PIC-301');
+    d.ind(510, 270, 'TI-301', S => S.p.T301, '°C', 1, 100);
+    // overhead recycle
+    d.pipe([[560, 150], [560, 110], [858, 110]], 'gas');
+    // PSV-301 on D-301 → flare header
+    d.pipe([[520, 152], [520, 140]], 'thin', { noArrow: true });
+    const o301 = d.psv(520, 128, 'PSV-301', 'l');
+    const f301 = d.pipe([[o301.x, o301.y], [450, o301.y], [450, 80], [184, 80]], 'flare', { noArrow: true });
+    UI.bind(f301, (S) => f301.classList.toggle('hot', !!(S.psv && S.psv['PSV-301'] && S.psv['PSV-301'].open)));
+    d.link(20, 80, 'TO FLARE (900)', 'utilities.html#PSV-301', 'l');
+    d.valve(700, 110, 'PIC-301', false, 'PV');
+    d.tag(650, 40, 'PIC-301');
+    d.hx(880, 110, ''); d.label(880, 146, 'E-301 condenser', 'lbl s', 'middle');
+    d.pipe([[896, 110], [990, 110]], 'liq');
+    d.link(992, 110, 'RECYCLE C3 → R-211', 'mzcr.html#PIC-211', 'r');
+    d.ind(780, 160, 'Recycle gas FI-302', S => S.p.F301, 't/h', 2, 150);
+    // powder out & routing selector
+    d.pipe([[560, 370], [560, 430]], '', { noArrow: true });
+    d.pipe([[560, 430], [898, 430]], '', { live: S => S.eq.GPR });
+    d.link(900, 430, 'TO R-401 GPR (400)', 'gpr.html#LIC-401', 'r');
+    d.pipe([[560, 430], [560, 560], [898, 560]], '', { live: S => !S.eq.GPR });
+    d.link(900, 560, 'BYPASS → D-501 (500)', 'finishing.html#LIC-601', 'r');
+    d.label(620, 470, 'HS-302 GPR routing', 'lbl');
+    d.btn(620, 480, 100, () => 'IN SERVICE', () => SZ.cmd({ type: 'gpr', on: true }), S => S.eq.GPR);
+    d.btn(726, 480, 100, () => 'BYPASS', () => SZ.cmd({ type: 'gpr', on: false }), S => !S.eq.GPR);
+    d.dyn(620, 524, S => S.eq.GPR ? 'Powder → R-401 for rubber phase (HECO)' : 'Powder bypasses R-401 (HOMO / RACO)', 'lbl s');
+    d.ind(300, 440, 'Powder to finishing', S => S.eq.GPR ? S.p.dis401 : S.p.rMZ, 't/h', 1, 150);
+  }
+});
+</script>
+</body>
+</html>

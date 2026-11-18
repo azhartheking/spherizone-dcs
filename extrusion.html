@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — 600 Extrusion & Pelletizing</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="extrusion">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx, NSV = 'http://www.w3.org/2000/svg';
+/* ---- derived extrusion values (training correlations, display only) ---- */
+const X = {
+  run: S => S.eq.EX601 && S.p.exRate > 0.5,
+  load: S => S.p.exRate / 30,                                        // fraction of design throughput
+  mfr: S => Math.max(0.5, S.p.pel.MFR || 12),
+  sei: S => 0.24 * Math.pow(12 / X.mfr(S), 0.1),                     // kWh/kg specific energy
+  power: S => X.run(S) ? S.p.exRate * X.sei(S) : 0,                   // MW
+  rpm: S => X.run(S) ? 230 * Math.min(1.3, X.load(S)) : 0,
+  melt: S => X.run(S) ? 222 + 10 * X.load(S) + 6 * Math.log(12 / X.mfr(S)) : 180,
+  die: S => X.run(S) ? 125 * X.load(S) * Math.pow(12 / X.mfr(S), 0.35) : 0,
+  screen: S => 22 + 18 * ((S.t / 3600) % 24) / 24 + (X.run(S) ? 0 : -20),   // screen pack fouls, changed every 24 h
+  cutter: S => X.run(S) ? 2500 * Math.min(1.3, X.load(S)) : 0,
+  hoS: S => 262 + 0.4 * Math.sin(S.t / 900), hoR: S => 262 - (X.run(S) ? 14 * X.load(S) : 2),
+  pw: S => 58 + (X.run(S) ? 6 * X.load(S) : 0) + ((S.p.cwT || 30) - 30) * 0.5,
+  zoneSP: [180, 200, 215, 225, 230, 235],
+  zone: (S, i) => X.zoneSP[i] + (X.run(S) ? 1.2 * Math.sin(S.t / 400 + i) : -0.5) + (S.nz ? S.nz.cw * 0.2 : 0),
+  addKgh: (S, k) => X.run(S) ? (S.add[k] || 0) * S.p.exRate / 1000 : 0,   // ppm × t/h = g/h → kg/h
+  hopper: (S, k, i) => { const r = X.addKgh(S, k); return r <= 0 ? 70 : 100 - ((S.t / 3600 * r / 600 * 100 + i * 17) % 75); }   // 600 kg hopper, refilled at 25 %
+};
+const ADD = [['AO', 'H-601', 'Antioxidant'], ['AS', 'H-602', 'Acid scav.'], ['NUC', 'H-603', 'Nucleator'], ['AST', 'H-604', 'Antistatic'], ['SLIP', 'H-605', 'Slip agent']];
+const el = (tag, at, parent) => { const e = document.createElementNS(NSV, tag); for (const k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; };
+
+UI.page({
+  defaultTag: 'LIC-601',
+  side: ['kpi', 'trend:silo'],
+  draw(d) {
+    d.label(20, 28, 'AREA 600 — ADDITIVES, EXTRUSION AND UNDERWATER PELLETIZING', 'lbl big');
+    // ---- polymer powder feed from the silo
+    d.link(20, 150, 'FROM D-601 SILO (500)', 'finishing.html#LIC-601', 'l');
+    d.pipe([[186, 150], [196, 150]], '', { noArrow: true });
+    const ph = el('path', { d: 'M196,135 L252,135 L252,190 L232,214 L216,214 L196,190 Z', class: 'eq' }, d.layer.eq);
+    d.label(224, 160, 'H-600', 'lbl s', 'middle'); d.label(224, 172, 'feed hopper', 'lbl s', 'middle');
+    d.pipe([[224, 214], [224, 278]], '', { noArrow: false });
+    d.dyn(150, 236, S => 'WF-600 powder ' + fx(S.p.exRate, 1) + ' t/h', 'lbl s', 'end');
+
+    // ---- additive hoppers + loss-in-weight feeders
+    d.label(300, 52, 'ADDITIVE HOPPERS AND LOSS-IN-WEIGHT FEEDERS → feed throat', 'lbl area');
+    ADD.forEach(([k, tag, name], i) => {
+      const cx = 330 + i * 102;
+      el('rect', { x: cx - 30, y: 62, width: 60, height: 48, rx: 3, class: 'eq' }, d.layer.eq);
+      const lv = el('rect', { x: cx - 26, width: 52, class: 'lvl' }, d.layer.eq);
+      UI.bind(lv, (S) => { const v = X.hopper(S, k, i); lv.setAttribute('height', 40 * v / 100); lv.setAttribute('y', 106 - 40 * v / 100); });
+      el('path', { d: `M${cx - 30},110 L${cx + 30},110 L${cx + 8},132 L${cx - 8},132 Z`, class: 'eq' }, d.layer.eq);
+      d.label(cx, 74, tag, 'lbl s', 'middle'); d.label(cx, 86, name, 'lbl s', 'middle');
+      el('rect', { x: cx - 22, y: 134, width: 44, height: 16, rx: 2, class: 'eq2' }, d.layer.eq);
+      d.label(cx, 146, 'WF-' + (601 + i), 'lbl vtag', 'middle');
+      d.ind(cx - 46, 158, k + ' ppm · kg/h', S => fx(S.add[k] || 0, 0) + ' · ' + fx(X.addKgh(S, k), 1), '', 0, 92);
+      d.pipe([[cx + 22, 142], [cx + 50, 142], [cx + 50, 222]], 'cat thin', { noArrow: true });
+    });
+    d.pipe([[330 + 4 * 102 + 50, 222], [262, 222], [262, 244], [228, 244]], 'cat');
+    d.label(270, 238, 'additives', 'lbl s');
+
+    // ---- extruder: drive, gearbox, 6-zone barrel
+    d.motor(110, 302, 'EX601', 'ext', '');
+    d.label(110, 340, 'M-601 main drive', 'lbl s', 'middle');
+    el('rect', { x: 154, y: 288, width: 42, height: 28, rx: 2, class: 'eq2' }, d.layer.eq); d.label(175, 306, 'GB', 'lbl s', 'middle');
+    el('rect', { x: 200, y: 280, width: 520, height: 44, rx: 4, class: 'eq' }, d.layer.eq);
+    d.label(212, 306, 'EX-601', 'lbl');
+    for (let i = 0; i < 6; i++) {
+      const x0 = 250 + i * 78;
+      el('rect', { x: x0, y: 284, width: 72, height: 36, rx: 2, class: 'eq2' }, d.layer.eq);
+      d.label(x0 + 6, 298, 'Z' + (i + 1), 'lbl s');
+      d.dyn(x0 + 6, 314, S => fx(X.zone(S, i), 0) + '°', 'lbl s');
+      d.label(x0 + 4, 340, 'TI-61' + (i + 1), 'lbl vtag');
+      d.dyn(x0 + 4, 352, () => 'SP ' + X.zoneSP[i] + ' °C', 'lbl s');
+      d.pipe([[x0 + 62, 420], [x0 + 62, 326]], 'hotoil');          // hot-oil drop to the zone jacket
+    }
+    // ---- hot-oil system
+    el('rect', { x: 60, y: 392, width: 96, height: 66, rx: 3, class: 'eq' }, d.layer.eq);
+    d.label(108, 418, 'H-650', 'lbl', 'middle'); d.label(108, 432, 'hot-oil heater', 'lbl s', 'middle');
+    d.pipe([[156, 420], [700, 420]], 'hotoil', { noArrow: true });
+    d.pipe([[700, 446], [214, 446]], 'hotoil');
+    el('circle', { cx: 200, cy: 446, r: 12, class: 'eq2' }, d.layer.eq); el('path', { d: 'M195,439 L207,446 L195,453 Z', fill: '#53575c' }, d.layer.eq);
+    d.pipe([[188, 446], [156, 446]], 'hotoil');
+    d.label(200, 470, 'P-651', 'lbl s', 'middle');
+    d.pipe([[700, 420], [760, 420], [760, 326]], 'hotoil'); d.pipe([[760, 446], [700, 446]], 'hotoil', { noArrow: true }); d.pipe([[860, 326], [860, 446], [760, 446]], 'hotoil', { noArrow: true });
+    d.dyn(300, 414, S => 'HOT-OIL SUPPLY  TI-651 ' + fx(X.hoS(S), 0) + ' °C', 'lbl s');
+    d.dyn(300, 462, S => 'HOT-OIL RETURN  TI-652 ' + fx(X.hoR(S), 0) + ' °C', 'lbl s');
+
+    // ---- melt pump, screen changer, die, underwater pelletizer
+    d.pipe([[720, 302], [746, 302]], '', { noArrow: true });
+    el('circle', { cx: 760, cy: 302, r: 14, class: 'eq2' }, d.layer.eq);
+    el('path', { d: 'M752,302 L768,302 M760,294 L760,310', stroke: '#53575c', 'stroke-width': 2 }, d.layer.eq);
+    d.label(760, 270, 'MP-601', 'lbl vtag', 'middle'); d.label(760, 260, 'melt pump', 'lbl s', 'middle');
+    d.pipe([[774, 302], [798, 302]], '', { noArrow: true });
+    el('rect', { x: 798, y: 288, width: 40, height: 28, rx: 2, class: 'eq2' }, d.layer.eq); d.label(818, 306, 'SC', 'lbl s', 'middle');
+    d.label(818, 278, 'SC-601', 'lbl vtag', 'middle');
+    d.pipe([[838, 302], [852, 302]], '', { noArrow: true });
+    el('rect', { x: 852, y: 282, width: 14, height: 40, class: 'eq' }, d.layer.eq); d.label(859, 276, 'DP', 'lbl s', 'middle');
+    el('rect', { x: 866, y: 278, width: 72, height: 48, rx: 6, class: 'eq' }, d.layer.eq);
+    d.label(902, 298, 'UWP-601', 'lbl vtag', 'middle'); d.label(902, 312, 'pelletizer', 'lbl s', 'middle');
+    el('rect', { x: 938, y: 290, width: 30, height: 24, rx: 3, class: 'eq2' }, d.layer.eq); d.label(953, 306, 'M-602', 'lbl s', 'middle');
+    // ---- pellet water loop and dryer
+    d.pipe([[902, 278], [902, 236], [1056, 236]], 'liq');
+    d.label(912, 230, 'pellets + water', 'lbl s');
+    el('rect', { x: 1058, y: 170, width: 64, height: 150, rx: 8, class: 'eq' }, d.layer.eq);
+    d.label(1090, 196, 'D-662', 'lbl vtag', 'middle'); d.label(1090, 208, 'spin dryer', 'lbl s', 'middle');
+    d.pipe([[1090, 170], [1090, 150]], '', { noArrow: false });
+    el('rect', { x: 1058, y: 120, width: 64, height: 30, rx: 3, class: 'eq2' }, d.layer.eq);
+    d.label(1090, 139, 'S-663 screen', 'lbl s', 'middle');
+    d.pipe([[1090, 120], [1090, 96]], '');
+    d.link(1000, 84, 'TO BLENDING / BAGGING', 'quality.html', 'r');
+    d.pipe([[1090, 320], [1090, 380]], 'liq'); d.label(1098, 360, 'water', 'lbl s');
+    el('rect', { x: 1050, y: 380, width: 80, height: 54, rx: 4, class: 'eq' }, d.layer.eq); d.label(1090, 404, 'TK-660', 'lbl vtag', 'middle'); d.label(1090, 418, 'pellet-water tank', 'lbl s', 'middle');
+    d.pipe([[1050, 470], [1016, 470]], 'liq', { noArrow: true }); d.pipe([[1090, 434], [1090, 470], [1052, 470]], 'liq', { noArrow: true });
+    el('circle', { cx: 1002, cy: 470, r: 12, class: 'eq2' }, d.layer.eq); el('path', { d: 'M1008,463 L996,470 L1008,477 Z', fill: '#53575c' }, d.layer.eq); d.label(1002, 494, 'P-661', 'lbl s', 'middle');
+    d.pipe([[990, 470], [952, 470]], 'liq', { noArrow: true });
+    d.hx(936, 470, ''); d.label(936, 500, 'E-661 (CW)', 'lbl s', 'middle');
+    d.pipe([[920, 470], [890, 470], [890, 328]], 'liq');
+    d.dyn(898, 400, S => 'TI-661 ' + fx(X.pw(S), 1) + ' °C', 'lbl s');
+
+    // ---- extrusion readings
+    const R = [['SI-601 screw speed', S => X.rpm(S), 'rpm', 0], ['JI-601 main motor', S => X.power(S), 'MW', 2], ['Specific energy', S => X.sei(S), 'kWh/kg', 3], ['Extruder rate', S => S.p.exRate, 't/h', 1],
+      ['TI-620 melt temp.', S => X.melt(S), '°C', 1], ['PI-621 die pressure', S => X.die(S), 'bar', 0], ['PDI-622 screen ΔP', S => X.screen(S), 'bar', 1], ['SI-602 cutter speed', S => X.cutter(S), 'rpm', 0]];
+    R.forEach((r, i) => d.ind(250 + (i % 4) * 160, 500 + Math.floor(i / 4) * 44, r[0], r[1], r[2], r[3], 150));
+    d.dyn(250, 600, S => X.screen(S) > 38 ? 'Screen pack ΔP high — screen change due (SC-601 is changed every 24 h)' : 'Screen pack clean — next change in ' + fx(24 - (S.t / 3600) % 24, 1) + ' h', 'lbl s');
+    d.dyn(250, 614, S => X.run(S) ? 'Extruder RUNNING — additives dosed in proportion to powder feed (ppm × t/h)' : 'Extruder STOPPED — feeders, cutter and melt pump stopped', 'lbl s');
+  },
+  panels(pn) {
+    const c = UI.card('Additive dosing — WF-601 … WF-605', ' <a href="quality.html">recipe →</a>');
+    const tb = UI.h('table', { class: 't' }); tb.innerHTML = '<tr><th class="l">Hopper / feeder</th><th class="l">Additive</th><th>Recipe ppm</th><th>Actual ppm</th><th>Feed kg/h</th><th></th></tr>';
+    for (const [k, tag, name] of ADD) {
+      const tr = UI.h('tr'); const rc = UI.h('td'), kg = UI.h('td'), inp = UI.h('input', { type: 'number', step: 50 }), tdI = UI.h('td'); tdI.append(inp);
+      const b = UI.h('button', { on: { click: () => SZ.cmd({ type: 'add', k, v: +inp.value }) } }, 'Set'); const tdB = UI.h('td'); tdB.append(b);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') SZ.cmd({ type: 'add', k, v: +inp.value }); });
+      tr.append(UI.h('td', { class: 'l' }, tag + ' / WF-' + (601 + ADD.findIndex(a => a[0] === k))), UI.h('td', { class: 'l' }, name + ' (' + k + ')'), rc, tdI, kg, tdB); tb.append(tr);
+      UI.bind(tr, (S) => { const t = SZ.GRADES[S.target].add[k], hard = S.level === 'hard'; rc.textContent = hard ? '— (manual)' : t; if (document.activeElement !== inp) inp.value = S.add[k];
+        kg.textContent = fx(X.addKgh(S, k), 1); const off = Math.abs(S.add[k] - t) > Math.max(50, 0.1 * t); tdI.className = off && !hard ? 'diff' : ''; });
+    }
+    c.querySelector('.bd').append(tb, UI.h('div', { class: 'hint' }, 'Feed rate = dose (ppm) × extruder rate (t/h) ÷ 1000. More than ±10 % from the grade recipe makes the pellets off-spec.'));
+    pn.append(c);
+    const c2 = UI.card('How the extrusion line works');
+    c2.querySelector('.bd').innerHTML = `<div class="hint" style="line-height:1.55">
+      <b>1 · Feed:</b> powder from silo D-601 drops through feed hopper H-600. Five loss-in-weight feeders weigh each additive continuously and dose it into the feed throat.<br>
+      <b>2 · Melt and mix:</b> the twin-screw extruder EX-601, driven by M-601 through gearbox GB, melts the powder and mixes in the additives. Six barrel zones (Z1–Z6, 180 → 235 °C) are heated by hot oil from heater H-650, circulated by P-651.<br>
+      <b>3 · Pressure and filtering:</b> melt pump MP-601 builds steady pressure. Screen changer SC-601 filters gels and dirt; its ΔP rises as the screen fouls.<br>
+      <b>4 · Cut:</b> the melt passes the heated die plate and the underwater pelletizer UWP-601 cuts it into pellets in tempered water (≈ 60 °C, loop TK-660 / P-661 / E-661).<br>
+      <b>5 · Dry and classify:</b> spin dryer D-662 removes the water, screen S-663 removes over- and under-size pellets, and the pellets go to blending silos and bagging.</div>`;
+    pn.append(c2);
+  }
+});
+</script>
+</body>
+</html>

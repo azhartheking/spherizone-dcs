@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone — Operator Log Sheet</title>
+<link rel="stylesheet" href="forms.css">
+<style>
+@page{size:A4 landscape;margin:0}
+table.log col.c-tag{width:19mm} table.log col.c-d{width:46mm} table.log col.c-u{width:13mm} table.log col.c-nr{width:31mm} table.log col.c-al{width:30mm} table.log col.c-rm{width:23mm}
+table.log td.nr{white-space:normal;line-height:1.1}
+</style>
+</head>
+<body class="landscape" data-doc="SZ-OPS-LOG-001" data-rev="1.4" data-unit="Unit 200 · Spherizone PP (training plant)">
+<div class="noprint">Print with <b>Ctrl+P → Save as PDF</b>, A4 landscape, margins <b>None</b>, "Background graphics" ON. Or use the ready PDF in the project folder.</div>
+
+<!-- ===================== PAGE 1 — SHIFT INFORMATION & HANDOVER RECEIVED ===================== -->
+<div class="sheet" data-t="Operator Log Sheet — Shift Information and Handover" data-s="One log sheet per shift · panel operator">
+<div class="fields c4">
+<div>Date <span class="fill"></span></div><div>Shift <span class="chk">☐</span>Day 07–19 <span class="chk">☐</span>Night 19–07</div><div>Shift team <span class="fill"></span></div><div>Log sheet no. <span class="fill"></span></div>
+<div>Panel operator <span class="fill"></span></div><div>Field operator(s) <span class="fill"></span></div><div>Shift supervisor <span class="fill"></span></div><div>Trainer <span class="fill"></span></div>
+<div>Target grade <span class="fill"></span></div><div>Grade running <span class="fill"></span></div><div>Donor in use <span class="chk">☐</span>C <span class="chk">☐</span>D</div><div>GPR <span class="chk">☐</span>Service <span class="chk">☐</span>Bypass</div>
+</div>
+<div class="cols">
+<div>
+<h2>Plant status at start of shift</h2>
+<p><span class="chk">☐</span> Normal operation at rate &nbsp; <span class="chk">☐</span> Reduced rate &nbsp; <span class="chk">☐</span> Grade change in progress<br>
+<span class="chk">☐</span> Start-up in progress &nbsp; <span class="chk">☐</span> Shutdown in progress &nbsp; <span class="chk">☐</span> Hot standby &nbsp; <span class="chk">☐</span> Tripped / stopped</p>
+<p>Production ______ t/h &nbsp; Pellets <span class="chk">☐</span> ON-SPEC <span class="chk">☐</span> OFF-SPEC &nbsp; Sim mode <span class="chk">☐</span>EASY <span class="chk">☐</span>HARD</p>
+<h2>Handover received — items to know</h2>
+<table class="t">
+<tr><th style="text-align:left;width:42mm">Item</th><th style="text-align:left">Details (tag, reason, since when)</th></tr>
+<tr><td>Standing alarms</td><td style="height:9mm"></td></tr>
+<tr><td>Controllers in MAN / out of normal mode</td><td style="height:9mm"></td></tr>
+<tr><td>SIS bypasses / overrides active</td><td style="height:9mm"></td></tr>
+<tr><td>Faulty instruments / equipment</td><td style="height:9mm"></td></tr>
+<tr><td>Work permits / isolations in force</td><td style="height:9mm"></td></tr>
+<tr><td>Special instructions / planned work</td><td style="height:13mm"></td></tr>
+</table>
+</div>
+<div>
+<h2>How to fill in this log</h2>
+<ol style="margin:0 0 0 5mm;padding-left:3mm;font-size:9pt">
+<li>Take a full round of readings from the DCS every <b>2 hours</b> (write the actual clock time at the top of each column), plus one at the start and end of the shift.</li>
+<li>Write the value exactly as shown on the DCS, with the same number of decimals.</li>
+<li>Compare each reading with the <b>Normal range</b>. If it is outside, <b>circle it in red</b> and enter it in the deviation record on page 5 with the action taken.</li>
+<li>Grade-dependent values: the bracket shows the R-7 (RACO) value; H-BOPP and H-FIBER exceptions are noted. For anything else use the setpoint card (SZ-CL-05).</li>
+<li>GPR section (R-401): only when HS-302 is IN SERVICE. Otherwise write <b>N/A</b> once across the row.</li>
+<li>Status rows: write <b>R</b> = running, <b>S</b> = stopped, <b>A</b> = AUTO, <b>M</b> = MAN.</li>
+<li>Record every alarm, trip, operator intervention and lab result on pages 4–5.</li>
+</ol>
+<h2>Handover received</h2>
+<div class="sig" style="grid-template-columns:1fr 1fr"><div><b>Handed over by</b>Name / signature / time</div><div><b>Received by</b>Name / signature / time</div></div>
+<div class="box note small" style="margin-top:4mm"><b>Joint walk-through of the DCS done:</b> &nbsp; <span class="chk">☐</span> Overview &nbsp; <span class="chk">☐</span> Alarm list &nbsp; <span class="chk">☐</span> Trends (last 2 h) &nbsp; <span class="chk">☐</span> Session card / procedure status &nbsp; <span class="chk">☐</span> Last lab result</div>
+</div>
+</div>
+</div>
+
+<!-- ===================== PAGE 2 — READINGS: AREA 100 + 200 ===================== -->
+<div class="sheet" data-t="Operator Log Sheet — Panel Readings (1/2)" data-s="Area 100 catalyst · Area 200 reactor R-211">
+<div class="fields c4" style="margin:0 0 2mm"><div>Date <span class="fill"></span></div><div>Shift <span class="fill"></span></div><div>Grade <span class="fill"></span></div><div>Operator <span class="fill"></span></div></div>
+<table class="log">
+<colgroup><col class="c-tag"><col class="c-d"><col class="c-u"><col class="c-nr"><col class="c-al"><col><col><col><col><col><col><col><col class="c-rm"></colgroup>
+<tr><th>Tag</th><th>Description</th><th>Unit</th><th>Normal range</th><th>Alarm / trip</th>
+<th class="tm">Start<span>time ____</span></th><th class="tm">+2 h<span>time ____</span></th><th class="tm">+4 h<span>time ____</span></th><th class="tm">+6 h<span>time ____</span></th><th class="tm">+8 h<span>time ____</span></th><th class="tm">+10 h<span>time ____</span></th><th class="tm">End<span>time ____</span></th><th>Remarks</th></tr>
+<tr class="sec"><td colspan="13">AREA 100 — Catalyst feed, precontact, prepolymerisation</td></tr>
+<tr><td class="tag">FIC-101</td><td class="d">Catalyst feed — PV</td><td class="u">kg/h</td><td class="nr">0.50–0.70 *</td><td class="al">dev &gt; 15 % (P3)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">FFIC-102</td><td class="d">TEAL / catalyst ratio</td><td class="u">g/g</td><td class="nr">4.5–5.5</td><td class="al">L &lt; 3 (P2)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">FFIC-103</td><td class="d">TEAL / donor ratio</td><td class="u">g/g</td><td class="nr">9–11 (BOPP 45–55)</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">TI-104</td><td class="d">Precontact pot D-104 temperature</td><td class="u">°C</td><td class="nr">13–17</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">TI-101</td><td class="d">Prepolymeriser R-101 temperature</td><td class="u">°C</td><td class="nr">18–24</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">AI-001</td><td class="d">Feed poisons H₂O + CO + COS</td><td class="u">ppm</td><td class="nr">&lt; 0.5</td><td class="al">H &gt; 1 (P2)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">—</td><td class="d">Catalyst mileage (KPI panel)</td><td class="u">t/kg</td><td class="nr">45–55</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr class="sec"><td colspan="13">AREA 200 — Multizone circulating reactor R-211</td></tr>
+<tr><td class="tag">TIC-211</td><td class="d">R-211 temperature — PV</td><td class="u">°C</td><td class="nr">79–81 (74–76)</td><td class="al">H85 HH90 SIS 92</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">TIC-211</td><td class="d">— output to E-211 CW valve</td><td class="u">%</td><td class="nr">30–45</td><td class="al">&gt; 60 low margin</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">PIC-211</td><td class="d">R-211 pressure — PV</td><td class="u">barg</td><td class="nr">27.5–28.5 (26.5–27.5)</td><td class="al">H 31 · L 24</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">PIC-211</td><td class="d">— output (&gt; 30 % = make-up)</td><td class="u">%</td><td class="nr">45–75</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">—</td><td class="d">Dew-point margin Pvap − P</td><td class="u">bar</td><td class="nr">&gt; 6</td><td class="al">L 3 (P1) · trip 0.5</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">AIC-211</td><td class="d">Riser H₂ — PV</td><td class="u">mol%</td><td class="nr">SP ± 5 % *</td><td class="al">dev &gt; 20 % (P3)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">AI-212</td><td class="d">Downer H₂</td><td class="u">mol%</td><td class="nr">≈ 0.1 × riser</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">FIC-212</td><td class="d">Barrier liquid C₃</td><td class="u">t/h</td><td class="nr">5.7–6.3 (FIBER 1.5)</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">HIC-213</td><td class="d">Solids circulation OP</td><td class="u">%</td><td class="nr">50–60</td><td class="al">&lt; 30 fouling</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">FIC-201</td><td class="d">Fresh propylene feed</td><td class="u">t/h</td><td class="nr">20–23</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">FIC-203</td><td class="d">Ethylene to R-211 (RACO only)</td><td class="u">kg/h</td><td class="nr">0 (R-7: 1100–1250)</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">R-211</td><td class="d">Production rate</td><td class="u">t/h</td><td class="nr">28–32</td><td class="al">L &lt; 20 (P3)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">—</td><td class="d">Heat of reaction / E-211 duty</td><td class="u">MW</td><td class="nr">15–18 / 11–14</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">—</td><td class="d">CW return temperature</td><td class="u">°C</td><td class="nr">28–33</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">—</td><td class="d">Fouling index R-211</td><td class="u">%</td><td class="nr">&lt; 10</td><td class="al">H &gt; 30 (P2)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">—</td><td class="d">Stickiness margin</td><td class="u">wt%</td><td class="nr">&gt; 1</td><td class="al">&lt; 0 sticky (P2)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+</table>
+<p class="small mut" style="margin-top:1mm">* Grade dependent — final catalyst: RAFFIA 0.62 · INJ 0.59 · FIBER 0.60 · BOPP 0.50 · R-7 0.70 kg/h. Riser H₂ SP: RAFFIA 0.97 · INJ 2.98 · FIBER 2.36 · BOPP 1.04 · R-7 1.75 mol%. Brackets = R-7.</p>
+</div>
+
+<!-- ===================== PAGE 3 — READINGS: 300 / 400 / 500-600 / EQUIPMENT ===================== -->
+<div class="sheet" data-t="Operator Log Sheet — Panel Readings (2/2)" data-s="Area 300 flash · Area 400 GPR (HECO) · Areas 500/600 finishing · equipment status">
+<div class="fields c4" style="margin:0 0 2mm"><div>Date <span class="fill"></span></div><div>Shift <span class="fill"></span></div><div>Grade <span class="fill"></span></div><div>Operator <span class="fill"></span></div></div>
+<table class="log">
+<colgroup><col class="c-tag"><col class="c-d"><col class="c-u"><col class="c-nr"><col class="c-al"><col><col><col><col><col><col><col><col class="c-rm"></colgroup>
+<tr><th>Tag</th><th>Description</th><th>Unit</th><th>Normal range</th><th>Alarm / trip</th>
+<th class="tm">Start<span>time ____</span></th><th class="tm">+2 h<span>time ____</span></th><th class="tm">+4 h<span>time ____</span></th><th class="tm">+6 h<span>time ____</span></th><th class="tm">+8 h<span>time ____</span></th><th class="tm">+10 h<span>time ____</span></th><th class="tm">End<span>time ____</span></th><th>Remarks</th></tr>
+<tr class="sec"><td colspan="13">AREA 300 — HP flash D-301</td></tr>
+<tr><td class="tag">PIC-301</td><td class="d">D-301 flash pressure</td><td class="u">barg</td><td class="nr">17.5–18.5</td><td class="al">H 20 · L 15</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">TI-301</td><td class="d">D-301 temperature</td><td class="u">°C</td><td class="nr">58–66</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">HS-302</td><td class="d">GPR routing (S = service / B = bypass)</td><td class="u">—</td><td class="nr">B (HECO: S)</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr class="sec"><td colspan="13">AREA 400 — Gas-phase reactor R-401 (HECO only — otherwise N/A)</td></tr>
+<tr><td class="tag">TIC-401</td><td class="d">R-401 temperature — PV / OP %</td><td class="u">°C / %</td><td class="nr">74–76 / 30–50</td><td class="al">H83 HH90 SIS 95</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">PIC-401</td><td class="d">R-401 pressure</td><td class="u">barg</td><td class="nr">13.5–14.5</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">AIC-401</td><td class="d">Gas ratio C₂/(C₂+C₃)</td><td class="u">mol/mol</td><td class="nr">0.38–0.42</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">AIC-402</td><td class="d">Gas ratio H₂/C₂</td><td class="u">mol/mol</td><td class="nr">0.045–0.055</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">LIC-401</td><td class="d">R-401 bed level</td><td class="u">%</td><td class="nr">55–65</td><td class="al">H 80 · L 35</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">R-401</td><td class="d">Rubber production / chunk index</td><td class="u">t/h / —</td><td class="nr">5–7 / &lt; 20</td><td class="al">chunk H &gt; 40</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr class="sec"><td colspan="13">AREAS 500/600 — Steamer, silo, extruder</td></tr>
+<tr><td class="tag">D-501</td><td class="d">Steam to steamer (ON / OFF)</td><td class="u">—</td><td class="nr">ON</td><td class="al">OFF (P2)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">LIC-601</td><td class="d">Silo D-601 level</td><td class="u">%</td><td class="nr">30–70</td><td class="al">H85 HH95 L10</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">EX-601</td><td class="d">Extruder rate</td><td class="u">t/h</td><td class="nr">≈ production</td><td class="al">stopped (P2)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">—</td><td class="d">Total production (KPI panel)</td><td class="u">t/h</td><td class="nr">30 (HECO 36)</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr><td class="tag">—</td><td class="d">Pellets status (ON / OFF-spec)</td><td class="u">—</td><td class="nr">ON</td><td class="al">OFF (P3)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr class="sec"><td colspan="13">EQUIPMENT AND SAFETY STATUS — R = running · S = stopped · A = AUTO · M = MAN</td></tr>
+<tr class="st"><td class="tag">P-701</td><td class="d">Cooling-water pump</td><td class="u">—</td><td class="nr">R</td><td class="al">S (P1)</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td></td></tr>
+<tr class="st"><td class="tag">K-211</td><td class="d">Cycle-gas compressor</td><td class="u">—</td><td class="nr">R</td><td class="al">S (P1) · SIS 60 s</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td></td></tr>
+<tr class="st"><td class="tag">K-401</td><td class="d">GPR compressor (HECO)</td><td class="u">—</td><td class="nr">R (or N/A)</td><td class="al">S in service (P1)</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td></td></tr>
+<tr class="st"><td class="tag">P-102/103</td><td class="d">TEAL / donor pumps</td><td class="u">—</td><td class="nr">R / R</td><td class="al">S (P2)</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td></td></tr>
+<tr class="st"><td class="tag">E-212</td><td class="d">Start-up heater (normal run: S)</td><td class="u">—</td><td class="nr">S</td><td class="al">trips 85 °C</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td class="r">R / S</td><td></td></tr>
+<tr class="st"><td class="tag">—</td><td class="d">Controllers in MAN (count)</td><td class="u">no.</td><td class="nr">0 (HIC-213 hand)</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr class="st"><td class="tag">SIS</td><td class="d">SIS / XV-901 CO kill status</td><td class="u">—</td><td class="nr">NORMAL</td><td class="al">BYPASS (P1)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr class="st"><td class="tag">FL-901</td><td class="d">Flare load (FI-901)</td><td class="u">t/h</td><td class="nr">0.3 (pilot only)</td><td class="al">H &gt; 5 (P2)</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+<tr class="st"><td class="tag">PSVs</td><td class="d">PSV-211 / 301 / 401 (C closed, O open)</td><td class="u">—</td><td class="nr">C / C / C</td><td class="al">O = lifted (P1)</td><td class="r">C / O</td><td class="r">C / O</td><td class="r">C / O</td><td class="r">C / O</td><td class="r">C / O</td><td class="r">C / O</td><td class="r">C / O</td><td></td></tr>
+<tr class="st"><td class="tag">—</td><td class="d">Active alarms P1 / P2 / P3</td><td class="u">no.</td><td class="nr">0 / 0 / 0</td><td class="al">—</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r"></td><td></td></tr>
+</table>
+<div class="fields c4" style="margin-top:2mm"><div>Readings checked by supervisor <span class="fill"></span></div><div>Time <span class="fill s"></span></div><div></div><div></div></div>
+</div>
+
+<!-- ===================== PAGE 4 — QUALITY, PRODUCTION, ADDITIVES ===================== -->
+<div class="sheet" data-t="Operator Log Sheet — Quality, Production and Additives" data-s="Lab results (Quality & Grades page) · totalisers (KPI panel) · EX-601 additive check">
+<h2>Laboratory results — pellets</h2>
+<table class="t">
+<tr><th style="width:10mm">#</th><th style="width:16mm">Sampled</th><th style="width:16mm">Result</th><th style="width:16mm">Type</th><th style="width:17mm">Grade</th><th>MFR<br>g/10 min</th><th>XS<br>wt%</th><th>PI</th><th>C₂<br>wt%</th><th>Rubber<br>%</th><th>Izod<br>kJ/m²</th><th>Tm<br>°C</th><th style="width:15mm">In spec?</th><th style="width:48mm">Action taken (tag / new SP)</th><th style="width:10mm">Init</th></tr>
+<tr><td></td><td></td><td></td><td class="c small">ROUT / SPOT</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="c small">Y / N</td><td></td><td></td></tr>
+<tr><td style="height:6.5mm"></td><td></td><td></td><td class="c small">ROUT / SPOT</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="c small">Y / N</td><td></td><td></td></tr>
+<tr><td style="height:6.5mm"></td><td></td><td></td><td class="c small">ROUT / SPOT</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="c small">Y / N</td><td></td><td></td></tr>
+<tr><td style="height:6.5mm"></td><td></td><td></td><td class="c small">ROUT / SPOT</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="c small">Y / N</td><td></td><td></td></tr>
+<tr><td style="height:6.5mm"></td><td></td><td></td><td class="c small">ROUT / SPOT</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="c small">Y / N</td><td></td><td></td></tr>
+<tr><td style="height:6.5mm"></td><td></td><td></td><td class="c small">ROUT / SPOT</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="c small">Y / N</td><td></td><td></td></tr>
+<tr><td style="height:6.5mm"></td><td></td><td></td><td class="c small">ROUT / SPOT</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="c small">Y / N</td><td></td><td></td></tr>
+<tr><td style="height:6.5mm"></td><td></td><td></td><td class="c small">ROUT / SPOT</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="c small">Y / N</td><td></td><td></td></tr>
+</table>
+<p class="small mut">Specs: H-RAFFIA MFR 3.0–4.0, XS ≤ 4.0 · H-INJ MFR 10.5–13.5, XS ≤ 4.0 · H-FIBER MFR 22–28, XS ≤ 4.0, PI ≤ 4.6 · H-BOPP MFR 2.6–3.4, XS 3.5–5.5, PI ≥ 5.0 · R-7 MFR 6–8, C₂ 3.0–4.0 · I-12 MFR 10.5–13.5, rubber 15–19 %, Izod ≥ 8. Routine sample every 30 min, result 10 min later.</p>
+<div class="cols">
+<div>
+<h2>Production totalisers</h2>
+<table class="t">
+<tr><th style="text-align:left">Item</th><th>Start of shift</th><th>End of shift</th><th>Shift total</th></tr>
+<tr><td>On-spec pellets (t)</td><td style="height:7mm"></td><td></td><td></td></tr>
+<tr><td>Off-spec pellets (t)</td><td style="height:7mm"></td><td></td><td></td></tr>
+<tr><td>Total pellets (t)</td><td style="height:7mm"></td><td></td><td></td></tr>
+<tr><td>Average production (t/h)</td><td style="height:7mm" class="c mut">—</td><td class="c mut">—</td><td></td></tr>
+<tr><td>On-spec yield (%)</td><td style="height:7mm" class="c mut">—</td><td class="c mut">—</td><td></td></tr>
+<tr><td>Silo D-601 inventory (t)</td><td style="height:7mm"></td><td></td><td class="c mut">—</td></tr>
+</table>
+<p class="small mut">Off-spec reason: <span class="chk">☐</span> grade change <span class="chk">☐</span> upset / trip <span class="chk">☐</span> additives <span class="chk">☐</span> steam off <span class="chk">☐</span> other ________</p>
+</div>
+<div>
+<h2>EX-601 additive package check</h2>
+<table class="t">
+<tr><th style="text-align:left">Additive</th><th>Recipe ppm<br><span class="small mut">(manual §6)</span></th><th>Actual — start</th><th>Actual — mid</th><th>Actual — end</th><th>OK ±10 %</th></tr>
+<tr><td>Antioxidant AO</td><td style="height:7mm"></td><td></td><td></td><td></td><td class="c">☐</td></tr>
+<tr><td>Acid scavenger AS</td><td style="height:7mm"></td><td></td><td></td><td></td><td class="c">☐</td></tr>
+<tr><td>Nucleator / clarifier NUC</td><td style="height:7mm"></td><td></td><td></td><td></td><td class="c">☐</td></tr>
+<tr><td>Antistatic AST</td><td style="height:7mm"></td><td></td><td></td><td></td><td class="c">☐</td></tr>
+<tr><td>Slip / antiblock SLIP</td><td style="height:7mm"></td><td></td><td></td><td></td><td class="c">☐</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ===================== PAGE 5 — EVENTS, DEVIATIONS, HANDOVER ===================== -->
+<div class="sheet" data-t="Operator Log Sheet — Events, Deviations and Shift Handover" data-s="Every alarm, trip, intervention and setpoint change">
+<div class="cols" style="grid-template-columns:1.55fr 1fr">
+<div>
+<h2>Event and alarm log</h2>
+<table class="t">
+<tr><th style="width:13mm">Time</th><th style="width:17mm">Tag</th><th style="width:8mm">Pri</th><th style="text-align:left">Alarm / event</th><th style="text-align:left">Action taken</th><th style="width:13mm">Cleared</th><th style="width:9mm">Init</th></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+<h2>Deviation record (readings outside the normal range)</h2>
+<table class="t">
+<tr><th style="width:13mm">Time</th><th style="width:17mm">Tag</th><th style="width:16mm">Reading</th><th style="width:20mm">Normal</th><th style="text-align:left">Cause and corrective action</th><th style="width:16mm">Back in range</th></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style="height:6.4mm"></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+</div>
+<div>
+<h2>Shift handover notes</h2>
+<p class="small mut">Plant status, grade, rate, problems, MAN controllers, bypasses, permits, what the next shift must watch or do.</p>
+<div class="lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+<h2>Plant status at end of shift</h2>
+<p><span class="chk">☐</span> Normal at rate &nbsp; <span class="chk">☐</span> Reduced rate &nbsp; <span class="chk">☐</span> Grade change<br><span class="chk">☐</span> Start-up &nbsp; <span class="chk">☐</span> Shutdown &nbsp; <span class="chk">☐</span> Hot standby &nbsp; <span class="chk">☐</span> Tripped</p>
+<p>Production ______ t/h &nbsp; Grade ________ &nbsp; Pellets <span class="chk">☐</span>ON <span class="chk">☐</span>OFF-spec</p>
+<div class="sig" style="grid-template-columns:1fr;gap:5mm;margin-top:5mm">
+<div><b>Panel operator (handed over)</b>Name / signature / time</div>
+<div><b>Incoming panel operator (received)</b>Name / signature / time</div>
+<div><b>Shift supervisor (reviewed)</b>Name / signature / time</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+(function () {
+  const b = document.body, sheets = [...document.querySelectorAll('.sheet')];
+  sheets.forEach((s, i) => {
+    const hd = document.createElement('table'); hd.className = 'dh';
+    hd.innerHTML = '<tr><td class="org">SPHERIZONE PP PLANT<small>' + b.dataset.unit + '</small></td><td class="ttl">' + s.dataset.t + '<small>' + (s.dataset.s || '') + '</small></td>' +
+      '<td class="meta"><div><span>Doc no.</span><b>' + b.dataset.doc + '</b></div><div><span>Revision</span><b>' + b.dataset.rev + '</b></div><div><span>Page</span><b>' + (i + 1) + ' of ' + sheets.length + '</b></div></td></tr>';
+    s.prepend(hd);
+    const ft = document.createElement('div'); ft.className = 'foot';
+    ft.innerHTML = '<span>' + b.dataset.doc + ' rev ' + b.dataset.rev + ' · Training document — not licensor data · Keep the completed sheet with the shift records</span><span>Page ' + (i + 1) + ' of ' + sheets.length + '</span>';
+    s.append(ft);
+  });
+})();
+</script>
+</body>
+</html>

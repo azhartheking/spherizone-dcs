@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — Quality & Grades</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="quality">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+let pick = null;
+UI.page({
+  graphic: false, side: ['kpi', 'trend:quality'],
+  body(view) {
+    // ---- recipe vs current SP
+    const rc = UI.card('Target-grade recipe vs current setpoints', '');
+    const bd = rc.querySelector('.bd');
+    const sel = UI.h('select'); for (const g in SZ.GRADES) sel.append(UI.h('option', { value: g }, g + ' — ' + SZ.GRADES[g].desc));
+    sel.addEventListener('change', () => pick = sel.value);
+    const bT = UI.h('button', { on: { click: () => SZ.cmd({ type: 'target', grade: sel.value }) } }, 'Set as target');
+    const bA = UI.h('button', { class: 'warn', on: { click: () => SZ.cmd({ type: 'recipe', grade: sel.value }) } }, 'Apply recipe SPs');
+    const row = UI.h('div', { class: 'tabs' }); row.append(sel, bT, bA);
+    const tb = UI.h('table', { class: 't', style: 'margin-top:6px' });
+    bd.append(row, tb, UI.h('div', { class: 'hint' }, 'Riser H2 and catalyst rate are solved from the model for the MFR target and ~30 t/h. Highlighted rows differ from the current SP. Click a row to open the tag.'));
+    const hardNote = UI.h('div', { class: 'note', style: 'margin-top:6px;border-left:4px solid var(--p2);background:#f4ecd2;padding:6px 10px' },
+      '<b>HARD mode:</b> recipe values are hidden. Work out each setpoint from the manual (§5, §6 and the start-up table in §8.4) and enter it on the faceplate.');
+    bd.append(hardNote);
+    UI.bind(tb, (S) => {
+      if (!pick) pick = S.target; if (document.activeElement !== sel) sel.value = pick;
+      const g = pick, hard = S.level === 'hard';
+      bA.style.display = hard ? 'none' : ''; hardNote.style.display = hard ? '' : 'none';
+      rc.querySelector('h3').firstChild.textContent = hard ? 'Current setpoints (target grade ' + S.target + ')' : 'Target-grade recipe vs current setpoints';
+      tb.innerHTML = '<tr><th class="l">Item</th>' + (hard ? '' : '<th>Recipe</th>') + '<th>Current</th><th class="l">Unit</th></tr>' + SZ.recipeItems(g).map(([lab, key, val, u]) => {
+        const cur = SZ.currentValue(S, key), same = SZ.sameVal(cur, val), dec = typeof val === 'string' ? 0 : (Math.abs(val) < 1 ? 3 : Math.abs(val) < 10 ? 2 : 1);
+        return `<tr class="clk" data-tag="${SZ.CTL[key] ? key : ''}"><td class="l">${lab}</td>` + (hard ? '' : `<td>${typeof val === 'string' ? val : fx(val, dec)}</td>`) +
+          `<td class="${same || hard ? '' : 'diff'}">${typeof cur === 'string' ? cur : fx(cur, dec)}</td><td class="l">${u}</td></tr>`; }).join('');
+    });
+    tb.addEventListener('click', (e) => { const r = e.target.closest('tr[data-tag]'); if (r && r.dataset.tag) UI.go(r.dataset.tag); });
+    view.append(rc);
+
+    // ---- grade library
+    const gl = UI.card('Grade library & specifications');
+    const gt = UI.h('table', { class: 't' });
+    let html = '<tr><th class="l">Grade</th><th class="l">Family</th><th>Donor</th><th>MFR target</th><th class="l">Specification</th><th>Barrier t/h</th><th>T °C</th><th>GPR</th></tr>';
+    for (const k in SZ.GRADES) { const g = SZ.GRADES[k];
+      const spec = Object.entries(g.spec).map(([p, r]) => p + ' ' + r[0] + (r[1] >= 99 ? '+' : '–' + r[1])).join(' · ');
+      html += `<tr><td class="l"><b>${k}</b></td><td class="l">${g.fam}</td><td>${g.donor}</td><td>${g.mfr}${g.fam === 'HECO' ? ' (matrix)' : ''}</td><td class="l">${spec}</td><td>${g.barrier}</td><td>${g.T}</td><td>${g.gpr ? 'SERVICE' : 'bypass'}</td></tr>`; }
+    gt.innerHTML = html; gl.querySelector('.bd').append(gt);
+    view.append(gl);
+
+    // ---- lab results
+    const lab = UI.card('Quality lab — pellet samples', '');
+    const sp = UI.h('button', { on: { click: () => SZ.cmd({ type: 'spot' }) } }, 'Take spot sample');
+    const lt = UI.h('table', { class: 't', style: 'margin-top:6px' });
+    lab.querySelector('.bd').append(UI.h('div', { class: 'tabs' }), lt);
+    lab.querySelector('.tabs').append(sp, UI.h('span', { class: 'hint', style: 'align-self:center' }, 'Routine sample every 30 sim-min · results 10 min after sampling · red = out of spec for the grade sampled'));
+    const keys = ['MFR', 'XS', 'PI', 'C2', 'RUB', 'IZOD', 'FLEX', 'TM'];
+    UI.bind(lt, (S) => {
+      lt.innerHTML = '<tr><th>#</th><th>Sampled</th><th class="l">Type</th><th class="l">Grade</th>' + keys.map(k => `<th>${SZ.PROPS[k].label}</th>`).join('') + '<th>Steam/Add</th></tr>' +
+        (S.lab.length ? S.lab.map(s => {
+          const ready = S.t >= s.due, g = SZ.GRADES[s.grade];
+          return `<tr><td>${s.no}</td><td>${SZ.fmtT(s.t)}</td><td class="l">${s.kind}</td><td class="l">${s.grade}</td>` + keys.map(k => {
+            if (!ready) return '<td class="hint">pending</td>';
+            const v = s.props[k], r = g.spec[k], bad = r && (v < r[0] || v > r[1]);
+            return `<td class="${bad ? 'bad' : (r ? 'okc' : '')}">${fx(v, SZ.PROPS[k].dec)}</td>`; }).join('') +
+            `<td class="${ready && (!s.steam || !s.add) ? 'bad' : ''}">${ready ? (s.steam ? 'ok' : 'NO STEAM') + ' / ' + (s.add ? 'ok' : 'ADD') : '…'}</td></tr>`;
+        }).join('') : `<tr><td colspan="13" class="l hint">No samples yet — first routine sample at ${SZ.fmtT(S.nextSample)}.</td></tr>`);
+    });
+    view.append(lab);
+
+    // ---- live properties
+    const lp = UI.card('Instantaneous vs pellet properties (target grade)');
+    const pt = UI.h('table', { class: 't' }); lp.querySelector('.bd').append(pt);
+    UI.bind(pt, (S) => {
+      const g = SZ.GRADES[S.target];
+      pt.innerHTML = '<tr><th class="l">Property</th><th>Riser zone</th><th>Downer zone</th><th>Instantaneous</th><th>Pellet (lag ~15 min)</th><th>Spec</th></tr>' + keys.map(k => {
+        const P = SZ.PROPS[k], r = g.spec[k], v = S.p.pel[k], bad = r && (v < r[0] || v > r[1]);
+        const z = k === 'MFR' ? [fx(S.p.MFRr, 2), fx(S.p.MFRd, 2)] : ['', ''];
+        return `<tr><td class="l">${P.label} ${P.unit}</td><td>${z[0]}</td><td>${z[1]}</td><td>${fx(S.p.inst[k], P.dec)}</td><td class="${bad ? 'bad' : ''}">${fx(v, P.dec)}</td><td>${r ? r[0] + ' – ' + (r[1] >= 99 ? '∞' : r[1]) : ''}</td></tr>`; }).join('');
+    });
+    view.append(lp);
+  }
+});
+</script>
+</body>
+</html>

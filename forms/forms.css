@@ -1,0 +1,90 @@
+/* Print forms for the Spherizone training plant: checklists and operator log sheets.
+   Designed for A4 printing (Microsoft Edge / Chrome → Print → Save as PDF). */
+:root{--ink:#111;--mut:#555;--line:#333;--soft:#9a9a9a;--shade:#e8e8e8;--shade2:#f4f4f4;--hp:#c62828;--hpbg:#fdecea;--ph:#3d4a5c}
+*{box-sizing:border-box}
+html,body{margin:0;background:#8d9195}
+body{font:9.5pt/1.3 "Segoe UI",Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{background:#fff;margin:12px auto;padding:9mm 10mm;box-shadow:0 2px 10px rgba(0,0,0,.35);position:relative;overflow:hidden}
+.portrait .sheet{width:210mm;height:297mm}
+.landscape .sheet{width:297mm;height:210mm;padding:7mm 9mm}
+@media print{html,body{background:#fff}.sheet{margin:0;box-shadow:none;break-after:page}.sheet:last-child{break-after:auto}.noprint{display:none!important}}
+.portrait{} @page{margin:0}
+.noprint{position:sticky;top:0;z-index:5;background:#33373b;color:#fff;padding:8px 14px;font-size:12px}
+.noprint b{color:#ffd54f}
+
+/* document header block (on every page) */
+table.dh{width:100%;border-collapse:collapse;margin-bottom:3mm}
+table.dh td{border:1.2px solid var(--line);padding:2px 6px;vertical-align:middle}
+table.dh .org{width:30%;font-weight:700;font-size:10pt;line-height:1.2}
+table.dh .org small{display:block;font-weight:400;font-size:7.5pt;color:var(--mut)}
+table.dh .ttl{text-align:center;font-weight:700;font-size:12.5pt;letter-spacing:.02em}
+table.dh .ttl small{display:block;font-weight:400;font-size:8pt;color:var(--mut);letter-spacing:0}
+table.dh .meta{width:23%;font-size:8pt}
+table.dh .meta div{display:flex;justify-content:space-between;gap:6px}
+table.dh .meta b{font-weight:600}
+.fill{display:inline-block;border-bottom:1px solid var(--line);min-width:28mm;height:1.1em}
+.fill.s{min-width:14mm}.fill.l{min-width:50mm}.fill.xl{min-width:80mm}
+
+/* info grid of blank fields */
+.fields{display:grid;gap:2px 10px;margin:2mm 0 3mm;font-size:9pt}
+.fields.c3{grid-template-columns:repeat(3,1fr)}.fields.c4{grid-template-columns:repeat(4,1fr)}.fields.c2{grid-template-columns:repeat(2,1fr)}
+.fields>div{display:flex;align-items:flex-end;gap:5px;white-space:nowrap}
+.fields>div .fill{flex:1;min-width:0}
+
+h1{font-size:20pt;margin:0 0 2mm}
+h2{font-size:11.5pt;margin:3mm 0 1.5mm;padding:2px 6px;background:var(--ph);color:#fff;letter-spacing:.03em}
+h3{font-size:10pt;margin:2.5mm 0 1mm}
+p{margin:1mm 0}
+.mut{color:var(--mut)}
+.small{font-size:8pt}
+
+/* checklist / log tables */
+table.t{width:100%;border-collapse:collapse;font-size:8.6pt}
+table.t th,table.t td{border:1px solid var(--line);padding:2px 4px;vertical-align:top}
+table.t th{background:var(--shade);font-weight:600;text-align:center;font-size:8pt}
+table.t td.c{text-align:center}
+table.t td.n{text-align:center;font-weight:600;width:7mm}
+table.t td.box{width:7mm;text-align:center;font-size:11pt;line-height:1}
+table.t td.box::before{content:"☐"}
+table.t td.w{width:13mm}.t td.w2{width:17mm}
+table.t td.tag{font:600 8.2pt Consolas,monospace;white-space:nowrap}
+table.t tr.ph td{background:var(--ph);color:#fff;font-weight:600;font-size:8.6pt;padding:2px 6px}
+table.t tr.hp td{background:var(--hpbg);border-color:var(--hp)}
+table.t tr.hp td.hpl{color:var(--hp);font-weight:700}
+table.t tr.sec td{background:var(--shade2);font-weight:700}
+table.t tr.na td{color:var(--mut)}
+.field{display:inline-block;font:700 7pt "Segoe UI";border:1px solid var(--mut);color:var(--mut);padding:0 3px;border-radius:2px;margin-left:3px;vertical-align:1px}
+.field.f{border-color:#8a5a00;color:#8a5a00}
+.dcs{border-color:#1f4f8f;color:#1f4f8f}
+.lim{font:8pt Consolas,monospace;white-space:nowrap}
+.hpbadge{display:inline-block;background:var(--hp);color:#fff;font-weight:700;font-size:7.5pt;padding:0 4px;border-radius:2px}
+
+/* log sheet reading grid */
+table.log{width:100%;border-collapse:collapse;font-size:8pt;table-layout:fixed}
+table.log th,table.log td{border:1px solid var(--line);padding:1px 3px;height:5.6mm;vertical-align:middle;overflow:hidden}
+table.log th{background:var(--shade);font-weight:600;font-size:7.6pt;text-align:center}
+table.log td.tag{font:600 7.8pt Consolas,monospace;white-space:nowrap}
+table.log td.d{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+table.log td.u{text-align:center;color:var(--mut)}
+table.log td.nr{font:7.6pt Consolas,monospace;text-align:center;white-space:nowrap}
+table.log td.al{font:7.2pt Consolas,monospace;text-align:center;white-space:nowrap;color:#7a1d1d}
+table.log td.r{background:#fff}
+table.log td.r:nth-of-type(odd){background:#fafafa}
+table.log tr.sec td{background:var(--ph);color:#fff;font-weight:600;font-size:8pt;height:5mm}
+table.log th.tm{height:9mm;vertical-align:top}
+table.log th.tm span{display:block;font-weight:400;font-size:6.8pt;color:var(--mut)}
+table.log tr.st td.r{text-align:center;color:#bbb;font-size:6.8pt}
+
+/* boxes */
+.box{border:1.2px solid var(--line);padding:2mm 3mm;margin:2mm 0}
+.box.note{background:#fff8e1;border-color:#c79a00}
+.box.warn{background:var(--hpbg);border-color:var(--hp)}
+.lines div{border-bottom:1px solid var(--soft);height:6.5mm}
+.sig{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm;margin-top:3mm}
+.sig div{border-top:1.2px solid var(--line);padding-top:1mm;font-size:8pt;color:var(--mut)}
+.sig div b{display:block;color:var(--ink);font-size:8.5pt}
+.legend{display:grid;grid-template-columns:auto 1fr;gap:1mm 3mm;font-size:8.5pt;align-items:center}
+.foot{position:absolute;left:10mm;right:10mm;bottom:5mm;display:flex;justify-content:space-between;font-size:7pt;color:var(--mut);border-top:1px solid var(--soft);padding-top:1mm}
+.landscape .foot{left:9mm;right:9mm;bottom:4mm}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
+.chk{font-size:11pt;margin-right:2px}

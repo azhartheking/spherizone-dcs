@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spherizone DCS — 900 Utilities & Flare</title>
+<link rel="stylesheet" href="assets/dcs.css?v=20261118192230">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body data-page="utilities">
+<div id="hdr"></div>
+<div id="main"><section id="view"></section><aside id="side"></aside></div>
+<div id="banner"></div>
+<script src="assets/model.js?v=20261118192230"></script>
+<script src="assets/core.js?v=20261118192230"></script>
+<script src="assets/ui.js?v=20261118192230"></script>
+<script>
+const fx = UI.fx;
+const NSV = 'http://www.w3.org/2000/svg';
+UI.page({
+  defaultTag: 'PSV-211',
+  side: ['kpi', 'trend:press'],
+  draw(d) {
+    d.label(20, 28, 'AREA 900 — FLARE / BLOWDOWN SYSTEM AND UTILITY HEADERS', 'lbl big');
+    d.label(20, 56, 'FLARE AND BLOWDOWN — every relief device discharges into the closed flare header', 'lbl area');
+
+    // ---- relief sources into the flare header
+    const live = (S) => (S.p.flareRelief || 0) > 0.2;
+    const src = [['PSV-211', 'R-211 reactor', 'mzcr', 100], ['PSV-301', 'D-301 flash drum', 'flash', 230], ['PSV-401', 'R-401 GPR', 'gpr', 360],
+      ['BDV-211', 'R-211 blowdown', 'mzcr', 490], ['PSV-102', 'D-102 TEAL drum', 'catalyst', 620]];
+    for (const [tag, what, pg, x] of src) {
+      const isLive = !!SZ.PSV[tag];
+      d.ind(x - 58, 70, tag + ' · ' + what, (S) => isLive ? (S.psv && S.psv[tag] && S.psv[tag].open ? 'RELIEVING ' + fx(S.psv[tag].f, 1) : 'closed  set ' + SZ.PSV[tag].set) : 'closed (static)', isLive ? 't/h' : '', 1, 116, tag);
+      const ln = d.pipe([[x, 102], [x, 148]], 'flare');
+      if (isLive) UI.bind(ln, (S) => ln.classList.toggle('hot', !!(S.psv && S.psv[tag] && S.psv[tag].open)));
+    }
+    const hdr = d.pipe([[60, 150], [698, 150]], 'flare');
+    UI.bind(hdr, (S) => hdr.classList.toggle('hot', live(S)));
+    d.label(60, 168, 'FLARE HEADER 24" — N2 purged', 'lbl s');
+    d.pipe([[20, 150], [58, 150]], 'n2', { noArrow: true }); d.label(14, 140, 'N2 purge', 'lbl s');
+
+    // ---- knock-out drum
+    d.rect(700, 124, 150, 54, 'eq', 24);
+    d.rect(706, 130, 138, 42, 'eq2', 18);
+    const kl = document.createElementNS(NSV, 'rect'); kl.setAttribute('x', 706); kl.setAttribute('width', 138); kl.setAttribute('class', 'lvl'); d.layer.eq.appendChild(kl);
+    UI.bind(kl, (S) => { const v = Math.min(100, S.p.koLvl == null ? 12 : S.p.koLvl); kl.setAttribute('height', 42 * v / 100); kl.setAttribute('y', 172 - 42 * v / 100); });
+    d.label(775, 196, 'D-901 flare knock-out drum', 'lbl s', 'middle');
+    // ---- flare stack + flame
+    d.pipe([[850, 140], [920, 140], [920, 400], [948, 400]], 'flare');
+    d.rect(950, 120, 22, 300, 'eq', 3);
+    d.rect(944, 412, 34, 10, 'eq', 2);
+    d.label(986, 400, 'FL-901', 'lbl'); d.label(986, 414, 'flare stack', 'lbl s');
+    const fg = document.createElementNS(NSV, 'g'); d.layer.fg.appendChild(fg);
+    const flame = document.createElementNS(NSV, 'path'); flame.setAttribute('class', 'flame'); fg.appendChild(flame);
+    const core = document.createElementNS(NSV, 'path'); core.setAttribute('class', 'flame'); fg.appendChild(core);
+    // smoke puffs for heavy flaring
+    const smoke = [0, 1, 2].map(i => { const c = document.createElementNS(NSV, 'circle'); c.setAttribute('fill', '#7d7f82'); c.setAttribute('opacity', 0); fg.appendChild(c); return c; });
+    UI.bind(fg, (S) => {
+      const L = S.p.flare || 0.3, big = L > 15, hgt = 14 + Math.min(71, 18 * Math.sqrt(L)), w = 6 + Math.min(28, 4 * Math.sqrt(L));
+      flame.setAttribute('d', `M${961 - w},120 Q${961 - w * 1.3},${120 - hgt * 0.5} 961,${120 - hgt} Q${961 + w * 1.3},${120 - hgt * 0.5} ${961 + w},120 Z`);
+      flame.setAttribute('fill', L > 30 ? '#ff3d00' : L > 5 ? '#ff6a00' : L > 1 ? '#ff8f1a' : '#ffb020'); flame.setAttribute('opacity', 0.92);
+      core.setAttribute('d', `M${961 - w * 0.45},120 Q961,${120 - hgt * 0.55} ${961 + w * 0.45},120 Z`); core.setAttribute('fill', '#ffe680');
+      const tt = (Date.now() / 1000) % 3;
+      smoke.forEach((c, i) => { const ph = (tt + i) % 3 / 3; c.setAttribute('cx', 961 + 18 * ph + i * 4); c.setAttribute('cy', 120 - hgt - 6 - 28 * ph); c.setAttribute('r', 6 + 10 * ph); c.setAttribute('opacity', big ? (0.55 * (1 - ph)).toFixed(2) : 0); });
+    });
+    d.ind(1010, 130, 'FI-901 flare load', S => S.p.flare || 0.3, 't/h', 1, 170, 'FL-901');
+    d.ind(1010, 170, 'Relief load (PSVs)', S => S.p.flareRelief || 0, 't/h', 1, 170);
+    d.ind(1010, 210, 'LI-901 KO drum level', S => S.p.koLvl == null ? 12 : S.p.koLvl, '%', 0, 170, 'D-901');
+    d.ind(1010, 250, 'Flare status', S => { const L = S.p.flare || 0; return L > 30 ? 'MAJOR FLARING' : L > 15 ? 'HEAVY FLARING' : L > 5 ? 'FLARING' : L > 1 ? 'SMALL FLARE' : 'PILOT ONLY'; }, '', 0, 170, 'FL-901');
+    d.ind(700, 206, 'Load / capacity', S => (S.p.flare || 0) / 60 * 100, '%', 0, 105);
+    d.ind(812, 206, 'Trip flaring', S => S.p.fb || 0, 't/h', 1, 104);
+    d.dyn(700, 252, S => { const n = S.psv ? Object.values(S.psv).reduce((s, x) => s + (x.n || 0), 0) : 0; return 'PSV lifts this session: ' + n; }, 'lbl s');
+
+    // ---- utility headers (display only)
+    d.label(20, 252, 'UTILITY HEADERS — shown for information, not operated in this version (except P-701)', 'lbl area');
+    // cooling water
+    d.rect(30, 280, 74, 52, 'eq', 4); d.label(67, 302, 'CT-701', 'lbl', 'middle'); d.label(67, 316, 'cooling tower', 'lbl s', 'middle');
+    d.pipe([[104, 305], [126, 305]], 'cw', { noArrow: true });
+    d.motor(140, 305, 'P701', 'pump', '');
+    d.label(140, 338, 'P-701', 'lbl s', 'middle');
+    d.pipe([[154, 305], [1150, 305]], 'cw', { noArrow: true });
+    d.pipe([[1150, 305], [1150, 350], [67, 350], [67, 334]], 'cw');
+    d.dyn(170, 298, S => 'CW SUPPLY 4.5 barg · ' + (S.eq.P701 ? '30.0' : '—') + ' °C', 'lbl s');
+    d.dyn(170, 364, S => 'CW RETURN · ' + fx(S.p.cwT, 1) + ' °C', 'lbl s');
+    [['E-211', 'R-211 cycle-gas cooler', 380], ['E-401', 'R-401 cycle-gas cooler', 560], ['E-301', 'flash recycle condenser', 740], ['EX-601', 'pellet water cooler', 920]].forEach(([t, w, x]) => {
+      d.hx(x, 327, ''); d.label(x + 20, 326, t, 'lbl s'); d.label(x + 20, 337, w, 'lbl s');
+    });
+    d.psv(1080, 293, 'PSV-701', 'r');
+    // LP steam
+    d.label(20, 412, 'HP steam 12 barg (B/L)', 'lbl s');
+    d.pipe([[20, 420], [1150, 420]], 'steam', { noArrow: true });
+    d.psv(230, 408, 'PRV-801', 'r'); d.label(300, 412, 'LP STEAM HEADER 4 barg', 'lbl s');
+    [['E-212 start-up heater', 420, S => S.eq.HTR ? 'IN USE' : 'standby'], ['D-501 steamer', 610, S => S.eq.STEAM ? 'IN USE' : 'off'], ['D-301 flash-line tracing', 800, () => 'in use'], ['Flare smokeless steam', 990, S => (S.p.flare || 0) > 1 ? 'IN USE' : 'standby']].forEach(([w, x, f]) => {
+      d.pipe([[x, 420], [x, 446]], 'steam'); d.label(x + 6, 444, w, 'lbl s'); d.dyn(x + 6, 456, f, 'lbl s');
+    });
+    // nitrogen
+    d.label(20, 492, 'N2 9 barg (B/L)', 'lbl s');
+    d.pipe([[20, 500], [1150, 500]], 'n2', { noArrow: true });
+    d.psv(230, 488, 'PRV-802', 'r'); d.label(300, 492, 'N2 HEADER 7 barg', 'lbl s');
+    [['D-501 dryer (N2 drying)', 420], ['Flare header purge 0.3 t/h', 610], ['R-211 / R-401 blanketing', 800], ['Catalyst / TEAL drum padding', 990]].forEach(([w, x]) => {
+      d.pipe([[x, 500], [x, 526]], 'n2'); d.label(x + 6, 524, w, 'lbl s');
+    });
+    // instrument air
+    d.label(20, 572, 'K-801 instrument-air compressor', 'lbl s');
+    d.rect(30, 580, 40, 24, 'eq2', 12); d.rect(90, 580, 38, 24, 'eq2', 3); d.label(109, 596, 'dryer', 'lbl s', 'middle');
+    d.pipe([[70, 592], [88, 592]], 'air', { noArrow: true });
+    d.pipe([[128, 592], [1150, 592]], 'air', { noArrow: true });
+    d.label(300, 586, 'INSTRUMENT AIR 6.5 barg — all control valves, XV-901 CO kill, BDV-211 (fail-safe on air loss)', 'lbl s');
+    d.label(20, 634, 'Legend:  - - - cooling water   ··· LP steam   — · — nitrogen   · · · instrument air   — — flare (red and moving = relieving)', 'lbl s');
+  }
+});
+</script>
+</body>
+</html>
