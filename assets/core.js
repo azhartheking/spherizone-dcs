@@ -17,7 +17,7 @@ SZ.log = function (S, src, msg) { S.journal.unshift({ t: S.t, src, msg }); if (S
 const ALM = [
   ['TAHH211', 'TIC-211', 1, 'MZCR temperature HH ≥ 90 °C', 'mzcr', (S) => S.p.T211 >= 90],
   ['TAH211', 'TIC-211', 2, 'MZCR temperature high ≥ 85 °C', 'mzcr', (S) => S.p.T211 >= 85 && S.p.T211 < 90],
-  ['TAL211', 'TIC-211', 3, 'MZCR temperature low ≤ 68 °C', 'mzcr', (S) => S.p.T211 <= 68 && S.p.rMZ > 2],
+  ['TAL211', 'TIC-211', 3, 'MZCR temperature low ≤ 68 °C', 'mzcr', (S) => S.p.T211 <= 68 && (S.p.rMZ > 2 || S.p.P211 > 15)],
   ['DEW211', 'PIC-211', 1, 'Dew-point margin Pvap − P < 3 bar (condensation risk)', 'mzcr', (S) => S.p.dew < 3],
   ['PAH211', 'PIC-211', 2, 'MZCR pressure high ≥ 31 barg', 'mzcr', (S) => S.p.P211 >= 31],
   ['PAL211', 'PIC-211', 2, 'MZCR pressure low ≤ 24 barg', 'mzcr', (S) => S.p.P211 <= 24],
@@ -89,6 +89,7 @@ SZ.HV = {
   MFRi: ['MFR instantaneous', 'g/10min', S => S.p.inst.MFR], MFRp: ['MFR pellet', 'g/10min', S => S.p.pel.MFR], XSi: ['XS instantaneous', 'wt%', S => S.p.inst.XS], XSp: ['XS pellet', 'wt%', S => S.p.pel.XS],
   C2p: ['C2 pellet', 'wt%', S => S.p.pel.C2], RUBp: ['Rubber pellet', '%', S => S.p.pel.RUB], PIp: ['PI pellet', '', S => S.p.pel.PI],
   OP211: ['TIC-211 OP (E-211 CW)', '%', S => S.ctl['TIC-211'].op], OP401: ['TIC-401 OP (E-401 CW)', '%', S => S.ctl['TIC-401'].op], OPmk: ['PIC-211 OP (make-up)', '%', S => S.ctl['PIC-211'].op],
+  QH: ['E-212 heater duty (% of 4 MW)', '%', S => (S.p.Qh || 0) * 25],
   P211: ['MZCR P PIC-211', 'barg', S => S.p.P211], PVAP: ['C3 vapour pressure (dew)', 'barg', S => S.p.pvap - 1.013], P301: ['Flash P PIC-301', 'barg', S => S.p.P301],
   H2r: ['Riser H2 AIC-211', 'mol%', S => S.p.H2r], H2d: ['Downer H2 AI-212', 'mol%', S => S.p.H2d], H2sp: ['AIC-211 SP', 'mol%', S => S.ctl['AIC-211'].sp], BAR: ['Barrier FIC-212', 't/h', S => S.p.F212],
   L401: ['GPR level LIC-401', '%', S => S.p.lvl401], C2R: ['C2/(C2+C3) ×100', '%', S => S.p.c2r * 100], P401: ['GPR P PIC-401', 'barg', S => S.p.P401],
@@ -98,7 +99,7 @@ SZ.TRENDS = {
   temps: ['Temperatures', ['T211', 'SP211', 'T401', 'T101']],
   prod: ['Production', ['rMZ', 'rG', 'prod', 'ex']],
   quality: ['Quality (inst vs pellet)', ['MFRi', 'MFRp', 'XSi', 'XSp']],
-  cooling: ['Cooling OP', ['OP211', 'OP401', 'OPmk']],
+  cooling: ['Cooling / heating', ['OP211', 'QH', 'OP401', 'OPmk']],
   press: ['MZCR pressure vs vapour pressure', ['P211', 'PVAP', 'P301']],
   h2: ['Hydrogen zones', ['H2r', 'H2d', 'H2sp', 'BAR']],
   gpr: ['GPR (HECO)', ['L401', 'C2R', 'RUBp', 'P401']],
@@ -107,7 +108,7 @@ SZ.TRENDS = {
 };
 function sampleHist(S) {
   const h = S.hist; h.t.push(Math.round(S.t));
-  for (const k in SZ.HV) { const v = SZ.HV[k][2](S); (h.d[k] = h.d[k] || []).push(+(+v).toPrecision(4)); }
+  for (const k in SZ.HV) { const v = SZ.HV[k][2](S); if (!h.d[k]) h.d[k] = new Array(h.t.length - 1).fill(+(+v).toPrecision(4)); h.d[k].push(+(+v).toPrecision(4)); }
   if (h.t.length > 720) { h.t.shift(); for (const k in h.d) h.d[k].shift(); }
 }
 
@@ -266,6 +267,7 @@ SZ.initCold = function (grade, keep) {
   for (const k in S.eq) S.eq[k] = false;
   for (const t in C) { C[t].mode = 'MAN'; C[t].op = 0; C[t].sp = 0; C[t].e1 = C[t].e2 = 0; }
   C['PIC-211'].op = 30;   // split-range mid point: vent and make-up both closed
+  C['TIC-212'].op = 100;  // heater steam valve wide open in MAN: E-212 START gives full 4 MW until TIC-212 goes to AUTO
   S.donor = g.donor;
   Object.assign(p, { catAct: 0, catMeas: 0, teal: 0, donor: 0, c1: 0, c2: 0, hold: 0, T104: 14, T101: 20,
     F201: 0, F203: 0, F212: 0, Fmk: 0, Fvent: 0, H2f: 0, C2gas: 0, T211: 25, P211: 1.0, H2r: 0, H2d: 0, H2gc: 0,
@@ -291,14 +293,14 @@ SZ.PROCS = {
     ['Start cooling-water pump P-701', 'mzcr', S => S.eq.P701],
     ['Start cycle-gas compressor K-211 (fluidises the riser)', 'mzcr', S => S.eq.K211],
     ['Set solids circulation HIC-213 OP to 50–60 %', 'mzcr', S => S.ctl['HIC-213'].op >= 50 && S.ctl['HIC-213'].op <= 60],
-    ['Start heater E-212 and warm R-211 to ≥ 70 °C — keep pressure low while cold (dew margin!)', 'mzcr', S => S.p.T211 >= 70],
+    ['Start heater E-212, TIC-212 AUTO at recipe − 2 °C; warm R-211 to ≥ 70 °C — keep pressure low while cold (dew margin!)', 'mzcr', S => S.p.T211 >= 70],
     ['Pressurise R-211: PIC-211 AUTO at the recipe SP (±1 barg) with dew margin > 3 bar', 'mzcr', S => auto(S, 'PIC-211') && near(S.p.P211, RC(S).P, 1) && S.p.dew > 3],
     ['Line up HP flash: PIC-301 AUTO, SP 18 barg', 'flash', S => auto(S, 'PIC-301') && near(S.ctl['PIC-301'].sp, 18, 1)],
     ['Start P-102 TEAL and P-103 donor; FFIC-102 / FFIC-103 AUTO at recipe ratios', 'catalyst', S => S.eq.TEALP && S.eq.DONP && auto(S, 'FFIC-102') && auto(S, 'FFIC-103') && near(S.ctl['FFIC-102'].sp, RC(S).tealCat, 0.5) && near(S.ctl['FFIC-103'].sp, RC(S).tealDon, RC(S).tealDon * 0.1)],
     ['Barrier FIC-212 AUTO at recipe; fresh C3 FIC-201 AUTO at ≈ 5 t/h', 'mzcr', S => auto(S, 'FIC-212') && near(S.ctl['FIC-212'].sp, RC(S).barrier, 0.5) && auto(S, 'FIC-201') && S.p.F201 >= 3],
     ['Riser H2: AIC-211 AUTO at the recipe SP', 'mzcr', S => auto(S, 'AIC-211') && near(S.ctl['AIC-211'].sp, RC(S).H2r, Math.max(0.15 * RC(S).H2r, 0.1))],
     ['Start catalyst feeder D-101; FIC-101 AUTO at ≈ 0.2 kg/h (light-off)', 'catalyst', S => S.eq.CATF && auto(S, 'FIC-101') && S.p.catMeas >= 0.15],
-    ['Reaction lit off (> 5 t/h): stop heater E-212, TIC-211 AUTO at recipe temperature', 'mzcr', S => S.p.rMZ > 5 && !S.eq.HTR && auto(S, 'TIC-211') && near(S.ctl['TIC-211'].sp, RC(S).T, 1)],
+    ['Reaction lit off (> 5 t/h, TIC-212 OP < 10 %): stop heater E-212, TIC-211 AUTO at recipe temperature', 'mzcr', S => S.p.rMZ > 5 && !S.eq.HTR && auto(S, 'TIC-211') && near(S.ctl['TIC-211'].sp, RC(S).T, 1)],
     ['Steam D-501 ON; start extruder EX-601 once silo > 20 %; LIC-601 AUTO', 'finishing', S => S.eq.STEAM && S.eq.EX601 && auto(S, 'LIC-601')],
     ['Ramp FIC-101 towards recipe and FIC-201 to ≥ 20 t/h — production ≥ 27 t/h', 'catalyst', S => S.p.prodTot >= 27 && S.p.F201 >= 20],
     ['Pellets ON-SPEC for the target grade', 'quality', S => S.p.pelOk && S.p.prodTot >= 25]
@@ -307,7 +309,7 @@ SZ.PROCS = {
     ['Cut catalyst: FIC-101 MAN, OP 0 % (or stop feeder D-101)', 'catalyst', S => S.p.catMeas < 0.01],
     ['Comonomer off: FIC-203 ethylene to 0 (and GPR C2 if in service)', 'mzcr', S => S.p.F203 < 10 && (!S.eq.GPR || S.p.C2f401 < 0.05)],
     ['Cut fresh C3 FIC-201 in step with production (≈ 0.7 × rate) so cold feed does not chill R-211', 'mzcr', S => S.p.prodTot < 15 && S.p.F201 <= 0.8 * S.p.prodTot + 2],
-    ['Production < 10 t/h: start heater E-212 to hold R-211 temperature (TIC-211 AUTO) — protects the dew margin', 'mzcr', S => S.p.prodTot < 10 && S.eq.HTR],
+    ['Production < 10 t/h: start heater E-212 with TIC-212 AUTO (recipe − 2 °C) to hold R-211 temperature — protects the dew margin', 'mzcr', S => S.p.prodTot < 10 && S.eq.HTR],
     ['Wait for the reaction to die away: production < 2 t/h', 'mzcr', S => S.p.prodTot < 2],
     ['GPR R-401 to BYPASS (HS-302)', 'flash', S => !S.eq.GPR],
     ['Hydrogen off: AIC-211 MAN, OP 0 %', 'mzcr', S => S.p.H2f < 0.05],
@@ -363,7 +365,7 @@ function loadState() {
   let a = parse(lsGet(KEY)), b = null;
   if (typeof window.name === 'string' && window.name.startsWith('SZSIM:')) b = parse(window.name.slice(6));
   let S = a; if (b && (!a || (b.savedAt || 0) > (a.savedAt || 0))) S = b;
-  if (S && S.v === 3) return S;
+  if (S && S.v === 3) return SZ.upgradeState(S);
   return null;
 }
 function saveState() {
@@ -381,7 +383,7 @@ function becomeLeader() {
   rt.S = S; rt.last = Date.now(); saveState();
 }
 // code version: a tab running newer simulator code always takes over from a tab with older code
-SZ.CODE_VER = 153;
+SZ.CODE_VER = 160;
 function heartbeat() { lsSet(LKEY, JSON.stringify({ id: rt.id, ts: Date.now(), ver: SZ.CODE_VER })); }
 function drainQueue() {
   const q = parse(lsGet(QKEY)); if (!q || !q.length) return; lsSet(QKEY, '[]');

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Spherizone DCS — Operator Manual</title>
-<link rel="stylesheet" href="assets/dcs.css?v=20261118194626">
+<link rel="stylesheet" href="assets/dcs.css?v=20261118234935">
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
   .man{background:var(--panel);border:1px solid var(--line);padding:18px 26px 30px;font-size:13px;line-height:1.55;max-width:1000px}
@@ -92,7 +92,7 @@
 <div><b>What you will practise</b>Reading a DCS screen and faceplates · PID control in AUTO/MAN · heat and mass balances in action · grade changes · alarms and safety trips · full start-up and shutdown procedures.</div>
 </div>
 <div class="by">Created by<span>Azhar</span>Designer and developer of this DCS training simulator</div>
-<div class="by" style="margin-top:8px">Version 1.5 · November 2026</div>
+<div class="by" style="margin-top:8px">Version 1.6 · November 2026</div>
 <div class="fine">For learning only. The plant model is a training-grade dynamic model built for teaching. Values are realistic in direction and size but are <b>not licensor data</b> and must never be used to operate a real plant. Spherizone, Spheripol and Avant are trademarks of the LyondellBasell family of companies; this is an independent educational project.</div>
 </div>
 <div class="warn"><b>Training use only.</b> The process model is a training-grade dynamic model (first-order and energy balances). Numbers are realistic in direction and magnitude but are <b>not licensor data</b> and must never be used to operate a real plant.</div>
@@ -150,8 +150,8 @@
 <li>Your plant and settings are stored in your own browser, so each person runs their own plant.</li>
 </ul>
 <div class="box" style="border:1px solid #b9bcbf;background:#f4f4f4;padding:6px 10px;margin:6px 0"><b>Downloads</b> (print one copy per exercise or shift):
-<a href="docs/Spherizone Student Manual v1.5.pdf">Student manual (PDF)</a> ·
-<a href="docs/Spherizone Start-up and Shutdown Checklists v1.4.pdf">Start-up &amp; shutdown checklists (PDF)</a> ·
+<a href="docs/Spherizone Student Manual v1.6.pdf">Student manual (PDF)</a> ·
+<a href="docs/Spherizone Start-up and Shutdown Checklists v1.5.pdf">Start-up &amp; shutdown checklists (PDF)</a> ·
 <a href="docs/Spherizone Operator Log Sheet v1.4.pdf">Operator log sheet (PDF)</a> ·
 <a href="forms/checklists.html">checklists (print from browser)</a> · <a href="forms/logsheet.html">log sheet (print from browser)</a><br>
 <b>Single-file offline version:</b> <a href="docs/Spherizone-DCS-Simulator-offline.html" download>Spherizone-DCS-Simulator-offline.html</a>. It is one file that runs the whole simulator when you double-click it, with no folder, installation or internet needed, so it is easy to send by e-mail or WhatsApp. It does not update itself, but it tells you when a newer version is online.</div>
@@ -370,6 +370,7 @@
 <li><b>Riser</b> and <b>downer</b> joined at the top by the separator and at the bottom by a leg with the solids circulation hand station <span class="tg">HIC-213</span>.</li>
 <li><b>K-211</b> cycle-gas compressor takes gas from the top separator, through cooler <b>E-211</b>, back to the riser bottom. K-211 keeps the riser fluidised — <b>if K-211 stops, the reactor cannot run</b>.</li>
 <li><b>E-211</b> cooling water (pump <b>P-701</b>) removes the heat of reaction. <span class="tg">TIC-211</span> controls reactor temperature by opening the CW valve.</li>
+<li><b>E-212</b> start-up heater (LP steam, 0–4 MW) warms the cycle gas when there is little or no reaction: at start-up, shutdown and hot standby. <span class="tg">TIC-212</span> throttles its steam valve TCV-212. Run it 2 °C below TIC-211 so heating and cooling never work against each other. The temperature loops act on PV changes for P (no output kick when you change the SP).</li>
 <li>Feeds into the cycle gas: fresh propylene <span class="tg">FIC-201</span>, pressure make-up <span class="tg">PIC-211</span>, hydrogen <span class="tg">AIC-211</span> (controlled on riser H2 from the on-line GC), ethylene <span class="tg">FIC-203</span> (RACO only).</li>
 <li><b>Barrier</b> liquid propylene into the downer stripping zone: <span class="tg">FIC-212</span>. More barrier → less H2 in the downer (AI-212) → bigger MFR difference between zones → higher PI.</li>
 <li><span class="tg">PIC-211</span> is <b>split range</b>: OP 0–30 % opens a vent to D-301; OP 30–100 % opens propylene make-up.</li>
@@ -662,6 +663,7 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 <tr><th class="l">Controller</th><th class="l">What it sets</th><th>H-RAFFIA</th><th>H-INJ</th><th>H-FIBER</th><th>H-BOPP</th><th>R-7</th><th class="l">Used in step</th></tr>
 <tr><td class="l">HIC-213</td><td class="l">Solids circulation OP</td><td>55 %</td><td>55 %</td><td>55 %</td><td>55 %</td><td>55 %</td><td class="l">3</td></tr>
 <tr><td class="l">TIC-211</td><td class="l">MZCR temperature</td><td>80 °C</td><td>80 °C</td><td>80 °C</td><td>80 °C</td><td>75 °C</td><td class="l">10 (MAN 0 % before)</td></tr>
+<tr><td class="l">TIC-212</td><td class="l">Heater E-212 (recipe − 2 °C)</td><td>78 °C</td><td>78 °C</td><td>78 °C</td><td>78 °C</td><td>73 °C</td><td class="l">4 (and shutdown 4)</td></tr>
 <tr><td class="l">PIC-211</td><td class="l">MZCR pressure</td><td>28 barg</td><td>28 barg</td><td>28 barg</td><td>28 barg</td><td>27 barg</td><td class="l">5</td></tr>
 <tr><td class="l">PIC-301</td><td class="l">Flash pressure</td><td colspan="5">18 barg</td><td class="l">6</td></tr>
 <tr><td class="l">External donor</td><td class="l">Drum selector</td><td>C</td><td>C</td><td>C</td><td><b>D</b></td><td>C</td><td class="l">checklist</td></tr>
@@ -681,7 +683,7 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 <tr><td>2</td><td class="l">Start cycle-gas compressor K-211</td><td class="l">Click the K-211 compressor symbol → <b>START</b>. If it trips at once, the dew margin is below 0.5 bar: lower PIC-211 SP first.</td><td class="l">K-211 running. Gas flow is needed before the heater can run.</td><td class="l">200</td></tr>
 <tr><td>3</td><td class="l">Solids circulation 50–60 %</td><td class="l">Click HIC-213 (hand station, always MAN) → type OP <b>55</b> → <b>Set OP</b>.</td><td class="l">Particle animation in the riser and downer.</td><td class="l">200</td></tr>
 <tr><td colspan="5" class="l" style="background:#c0532b;color:#fff;font-weight:600">Phase B — Heat-up</td></tr>
-<tr><td>4</td><td class="l">Warm R-211 to ≥ 70 °C (aim for 75 °C)</td><td class="l">Click <span class="tg">E-212</span> → START (needs K-211 running). Leave TIC-211 in <b>MAN, OP 0 %</b>, so the cooler does not fight the heater. Keep PIC-211 SP low (≤ 5 barg). The step ticks at 70 °C, but keep heating to ≈ 75 °C before step 5 — it gives the dew margin you need at 27–28 barg.</td><td class="l">E-212 "heater ON 4 MW". TIC-211 PV rises ≈ 0.8 °C/min, 70 °C after ≈ 1 h.</td><td class="l">200</td></tr>
+<tr><td>4</td><td class="l">Warm R-211 to ≥ 70 °C (aim for 75 °C)</td><td class="l">Click <span class="tg">E-212</span> → START (needs K-211 running). Then click <span class="tg">TIC-212</span> (heater controller, under TIC-211) → <b>AUTO</b>, SP <b>78 °C</b> (R-7: <b>73 °C</b>) = recipe temperature − 2 °C. Leave TIC-211 in <b>MAN, OP 0 %</b> for now. Keep PIC-211 SP low (≤ 5 barg). The step ticks at 70 °C, but keep heating to ≈ 75 °C before step 5 — it gives the dew margin you need at 27–28 barg.</td><td class="l">E-212 "heater ON 4.0 MW", TCV-212 100 %. TIC-211 PV rises ≈ 0.8 °C/min, 70 °C after ≈ 1 h. Near 78 °C TCV-212 closes by itself and the heater holds the temperature — it can no longer overheat to the 85 °C trip.</td><td class="l">200</td></tr>
 <tr><td colspan="5" class="l" style="background:#2f6fb3;color:#fff;font-weight:600">Phase C — Pressurise and line up</td></tr>
 <tr><td>5</td><td class="l">Pressurise R-211</td><td class="l">Keep the heater on. PIC-211 → AUTO, then raise the SP <b>in stages</b>: 10 → 18 → 24 → <b>27 barg (RACO) / 28 barg (HOMO)</b>. Before each raise check the <b>Dew-point margin</b> box is &gt; 3 bar. Safe maximum: ≈ 22 barg at 65 °C, 26 barg at 70 °C, 30 barg at 75 °C.</td><td class="l">PIC-211 OP rises above 30 % (make-up side). Pressure reaches SP in ≈ 30 min. Dew margin stays &gt; 3 bar. If it falls, lower the SP and heat more.</td><td class="l">200</td></tr>
 <tr><td>6</td><td class="l">Line up the HP flash</td><td class="l">300 Flash page: click PIC-301 → AUTO → SP <b>18</b> → Set SP.</td><td class="l">PIC-301 in AUTO (pressure builds slowly as gas arrives).</td><td class="l">300</td></tr>
@@ -690,20 +692,21 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 <tr><td>8</td><td class="l">Barrier and low fresh C₃</td><td class="l">FIC-212 → AUTO, SP <b>6 t/h</b> (H-FIBER <b>1.5 t/h</b>). FIC-201 → AUTO, SP <b>5 t/h</b>.</td><td class="l">Total feed ≤ 12 t/h. PIC-211 holds pressure by venting (OP &lt; 30 %).</td><td class="l">200</td></tr>
 <tr><td>9</td><td class="l">Riser hydrogen</td><td class="l">AIC-211 → AUTO, SP from the start-up table: R-7 <b>1.75</b>, H-INJ <b>2.98</b>, H-RAFFIA <b>0.97</b>, H-FIBER <b>2.36</b>, H-BOPP <b>1.04 mol%</b>.</td><td class="l">Riser H₂ rises to SP over ≈ 10–20 min. Downer H₂ stays low (barrier working).</td><td class="l">200</td></tr>
 <tr><td colspan="5" class="l" style="background:#d0782a;color:#fff;font-weight:600">Phase E — Light-off</td></tr>
-<tr><td>10</td><td class="l">Catalyst in</td><td class="l">Start feeder D-101. FIC-101 → AUTO, SP <b>0.2 kg/h</b> (not the recipe value yet). TIC-211 → AUTO, SP <b>75 °C</b> (R-7) or <b>80 °C</b> (HOMO).</td><td class="l">Catalyst flow ≈ 0.2 kg/h. Production appears after ≈ 30 min and builds over 1 h. Catalyst hold-up rises.</td><td class="l">100</td></tr>
-<tr><td>11</td><td class="l">Reaction lit off (&gt; 5 t/h)</td><td class="l">Click E-212 → STOP.</td><td class="l">Heat of reaction &gt; 3 MW. TIC-211 opens E-211 to hold SP. No more heater needed. (It trips by itself at 85 °C.)</td><td class="l">200</td></tr>
+<tr><td>10</td><td class="l">Catalyst in</td><td class="l">Start feeder D-101. FIC-101 → AUTO, SP <b>0.2 kg/h</b> (not the recipe value yet). TIC-211 → AUTO, SP <b>75 °C</b> (R-7) or <b>80 °C</b> (HOMO). Keep the heater running with TIC-212 in AUTO.</td><td class="l">Catalyst flow ≈ 0.2 kg/h. Production appears after ≈ 30 min and builds over 1 h. As the heat of reaction grows, <b>TIC-212 OP falls by itself</b> (100 → 0 %). TIC-211 only opens the cooler above its SP: the 2 °C gap stops heater and cooler fighting.</td><td class="l">100</td></tr>
+<tr><td>11</td><td class="l">Reaction lit off (&gt; 5 t/h)</td><td class="l">Wait until production &gt; 5 t/h <b>and TIC-212 OP &lt; 10 %</b>, then click E-212 → STOP.</td><td class="l">The reaction now carries the heat. Stopping the heater costs almost nothing, so the temperature stays put. <b>Do not stop it while TIC-212 OP is still high</b>: you would lose up to 4 MW at once and R-211 cools (see the warning below).</td><td class="l">200</td></tr>
 <tr><td colspan="5" class="l" style="background:#3a8a3f;color:#fff;font-weight:600">Phase F — Finishing on line</td></tr>
 <tr><td>12</td><td class="l">Steam, extruder, silo level</td><td class="l">Finishing page: <b>STEAM ON</b>. When the silo is &gt; 20 %, start EX-601, then LIC-601 → AUTO, SP <b>50 %</b>.</td><td class="l">Silo level rises, then the extruder rate follows production.</td><td class="l">500/600</td></tr>
 <tr><td colspan="5" class="l" style="background:#1f8a8a;color:#fff;font-weight:600">Phase G — Rate and specification</td></tr>
 <tr><td>13</td><td class="l">Ramp to rate</td><td class="l">Raise FIC-101 SP by ≈ 0.05 kg/h every 10 min up to the final value (R-7 <b>0.70</b>, H-INJ <b>0.59</b> kg/h…). Raise FIC-201 with production: ≈ 0.75 × production, up to <b>22 t/h</b>. RACO: when production &gt; 15 t/h add ethylene FIC-203 in three steps (400 → 800 → <b>1167 kg/h</b>).</td><td class="l">Production climbs to ≥ 27 t/h. TIC-211 OP stays below 50 % (spare cooling). PIC-211 OP moves to the make-up side.</td><td class="l">100 / 200</td></tr>
 <tr><td>14</td><td class="l">Pellets on-spec</td><td class="l">Check MFR, XS and C₂ on the KPI panel and take a spot sample on the Quality page. Correct with AIC-211 if needed.</td><td class="l">Header shows <b>ON-SPEC</b>. Session card shows <b>COMPLETE</b>.</td><td class="l">Quality</td></tr>
 </table>
+<div class="warn"><b>Why the temperature can run away downwards at light-off.</b> At 1–3 t/h the reaction makes only 0.5–1.5 MW, but the cold feed (FIC-201 + barrier + make-up) and the heat losses take 1.5–2.5 MW. Without the heater the balance is negative, so R-211 cools. Colder catalyst is less active, so it cools faster still. The vapour pressure falls with the temperature: at 28 barg the dew margin reaches 0 bar near 66 °C. K-211 trips on liquid carry-over (margin &lt; 0.5 bar) and 60 s later the SIS fires the CO kill. <b>Prevention:</b> keep the heater on with TIC-212 in AUTO until it is no longer working (OP &lt; 10 %), keep FIC-201 at ≈ 5 t/h until light-off, and never leave TIC-212 in MAN 100 % (full 4 MW, trips at 85 °C). <b>If it happens:</b> restart E-212 at once (allowed below 85 °C) with TIC-212 in AUTO, and cut FIC-201. If the margin falls below 3 bar, lower PIC-211 SP by 2–3 barg.</div>
 <div class="tip"><b>Alarms during start-up:</b> the simulator suppresses alarms that only make sense in operation while the plant is down (section 10.5), so a cold plant starts quiet. Alarms come back automatically as production passes 1–5 t/h. A few (extruder stopped, low production) are normal until finishing is on line.</div>
 
 <h3>8.5 Hot standby and restart</h3>
 <p><b>Hot standby</b> means the reactor is warm, pressurised and circulating, with K-211 and P-701 running and no catalyst. It is the normal "parking" state for a short stop, for example while a downstream problem is fixed. A restart from hot standby takes about an hour instead of six.</p>
 <ul>
-<li><b>To park the plant:</b> do shutdown steps 1–9 (8.6) and stop there. Keep E-212 on with TIC-211 in AUTO to hold the temperature, and keep PIC-211 at its normal SP. Watch the dew margin.</li>
+<li><b>To park the plant:</b> do shutdown steps 1–9 (8.6) and stop there. Keep E-212 on with TIC-212 in AUTO (recipe − 2 °C) and TIC-211 in AUTO to hold the temperature, and keep PIC-211 at its normal SP. Watch the dew margin.</li>
 <li><b>To restart from hot standby:</b> do start-up steps 7–14 (8.4). Check first that the temperature is ≥ 72 °C and the dew margin is &gt; 3 bar.</li>
 </ul>
 
@@ -717,7 +720,7 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 <tr><td>2</td><td class="l">Comonomer off</td><td class="l">FIC-203 → MAN 0 % (RACO). On HECO also AIC-401 → MAN 0 %.</td><td class="l">Stops sticky, high-C₂ material being made at low rate.</td></tr>
 <tr><td colspan="4" class="l" style="background:#c0532b;color:#fff;font-weight:600">Phase B — Feed down, hold temperature</td></tr>
 <tr><td>3</td><td class="l">Fresh C₃ with production</td><td class="l">Keep the FIC-201 SP ≈ 0.7 × production (30 t/h → 21, 15 t/h → 10, 5 t/h → 3.5).</td><td class="l">Less cold feed = less chilling. Pressure stays on PIC-211.</td></tr>
-<tr><td>4</td><td class="l">Heater on below 10 t/h</td><td class="l">E-212 → START. Keep TIC-211 in AUTO.</td><td class="l">TIC-211 holds SP. Dew margin stays &gt; 3 bar.</td></tr>
+<tr><td>4</td><td class="l">Heater on below 10 t/h</td><td class="l">E-212 → START. TIC-212 AUTO, SP recipe − 2 °C (78, R-7 73). Keep TIC-211 in AUTO.</td><td class="l">TIC-212 OP rises as the reaction heat fades. Temperature stays near SP. Dew margin stays &gt; 3 bar.</td></tr>
 <tr><td>5</td><td class="l">Production &lt; 2 t/h</td><td class="l">Wait.</td><td class="l">Heat of reaction ≈ 0. The reaction is practically dead.</td></tr>
 <tr><td colspan="4" class="l" style="background:#7b5ea7;color:#fff;font-weight:600">Phase C — Isolate chemicals and feeds (plant now in HOT STANDBY after step 9)</td></tr>
 <tr><td>6</td><td class="l">GPR to bypass</td><td class="l">HS-302 → BYPASS (Flash or GPR page).</td><td class="l">Ticks at once on HOMO/RACO grades.</td></tr>
@@ -763,11 +766,11 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 <div class="card2">
 <div><b>START-UP (cold)</b>
 <ol>
-<li>P-701 ON</li><li>K-211 ON</li><li>HIC-213 55 %</li><li>E-212 ON → ≥ 72 °C</li><li>PIC-211 AUTO → recipe P</li><li>PIC-301 AUTO 18 barg</li><li>P-102, P-103 ON; FFIC-102/103 AUTO</li><li>FIC-212 recipe; FIC-201 5 t/h</li><li>AIC-211 AUTO recipe</li><li>D-101 ON; FIC-101 0.2 kg/h; TIC-211 AUTO</li><li>&gt; 5 t/h → E-212 OFF</li><li>Steam ON; EX-601 ON at silo &gt; 20 %; LIC-601 AUTO</li><li>Ramp catalyst and C₃ → ≥ 27 t/h</li><li>Pellets ON-SPEC</li>
+<li>P-701 ON</li><li>K-211 ON</li><li>HIC-213 55 %</li><li>E-212 ON, TIC-212 AUTO 78 °C (R-7 73) → ≥ 72 °C</li><li>PIC-211 AUTO → recipe P</li><li>PIC-301 AUTO 18 barg</li><li>P-102, P-103 ON; FFIC-102/103 AUTO</li><li>FIC-212 recipe; FIC-201 5 t/h</li><li>AIC-211 AUTO recipe</li><li>D-101 ON; FIC-101 0.2 kg/h; TIC-211 AUTO</li><li>&gt; 5 t/h and TIC-212 OP &lt; 10 % → E-212 OFF</li><li>Steam ON; EX-601 ON at silo &gt; 20 %; LIC-601 AUTO</li><li>Ramp catalyst and C₃ → ≥ 27 t/h</li><li>Pellets ON-SPEC</li>
 </ol></div>
 <div><b>CONTROLLED SHUTDOWN</b>
 <ol>
-<li>FIC-101 MAN 0 %</li><li>FIC-203 (and AIC-401) MAN 0 %</li><li>FIC-201 ≈ 0.7 × production</li><li>&lt; 10 t/h → E-212 ON, TIC-211 AUTO</li><li>Wait for &lt; 2 t/h</li><li>HS-302 BYPASS</li><li>AIC-211 MAN 0 %</li><li>P-102, P-103 OFF</li><li>FIC-201, FIC-212 MAN 0 %</li><li>LIC-601 SP 5 % → EX-601 OFF at ≤ 10 %</li><li>Steam OFF</li><li>PIC-211 SP 3 barg → E-212 OFF</li><li>K-211, P-701 OFF</li>
+<li>FIC-101 MAN 0 %</li><li>FIC-203 (and AIC-401) MAN 0 %</li><li>FIC-201 ≈ 0.7 × production</li><li>&lt; 10 t/h → E-212 ON, TIC-212 AUTO 78 °C, TIC-211 AUTO</li><li>Wait for &lt; 2 t/h</li><li>HS-302 BYPASS</li><li>AIC-211 MAN 0 %</li><li>P-102, P-103 OFF</li><li>FIC-201, FIC-212 MAN 0 %</li><li>LIC-601 SP 5 % → EX-601 OFF at ≤ 10 %</li><li>Steam OFF</li><li>PIC-211 SP 3 barg → E-212 OFF</li><li>K-211, P-701 OFF</li>
 </ol>
 <b>EMERGENCY</b>: FIC-101 0 → ARM → INJECT → confirm → make safe → find the cause.</div>
 </div>
@@ -974,7 +977,7 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 <tr><td class="l">D-662 · S-663 · TK-660 · P-661 · E-661</td><td class="l">Spin dryer, pellet screen, pellet-water tank, pump and cooler</td><td class="l">600</td></tr>
 <tr><td class="l">EX-601 (finishing view)</td><td class="l">Extruder / pelletiser with additive dosing</td><td class="l">600</td></tr>
 </table>
-<p>Controllers: FIC-101, FFIC-102, FFIC-103, FIC-201, FIC-203, TIC-211, PIC-211, AIC-211, FIC-212, HIC-213, PIC-301, TIC-401, PIC-401, AIC-401, AIC-402, LIC-401, LIC-601. Each controller's description and range is shown on its faceplate.</p>
+<p>Controllers: FIC-101, FFIC-102, FFIC-103, FIC-201, FIC-203, TIC-211, TIC-212, PIC-211, AIC-211, FIC-212, HIC-213, PIC-301, TIC-401, PIC-401, AIC-401, AIC-402, LIC-401, LIC-601. Each controller's description and range is shown on its faceplate.</p>
 
 <!-- ============================================================ -->
 <h2 id="s14">15. Glossary</h2>
@@ -1088,13 +1091,21 @@ This is what the controllers are for. The instructor can switch it off (Instruct
 <li>Installable app that works offline and updates automatically when published online (§2.1).</li>
 <li>Download links for the PDFs.</li>
 </ul></td></tr>
+<tr><td>1.6</td><td class="l">
+<ul style="margin:0;padding-left:16px">
+<li>Start-up heater E-212 is now throttled by its own controller TIC-212 / TCV-212 (0–4 MW) instead of a fixed 4 MW on/off duty (§4.2, §8.4 steps 4, 10, 11).</li>
+<li>Temperature controllers no longer kick the cooling valve when the SP is changed.</li>
+<li>New warning on the light-off temperature run-down: cooling, dew margin, K-211 trip, then CO kill.</li>
+<li>Low-temperature alarm also active while R-211 is pressurised.</li>
+<li>Heater duty added to the cooling trend.</li>
+</ul></td></tr>
 </table>
 </div>
 </template>
 
-<script src="assets/model.js?v=20261118194626"></script>
-<script src="assets/core.js?v=20261118194626"></script>
-<script src="assets/ui.js?v=20261118194626"></script>
+<script src="assets/model.js?v=20261118234935"></script>
+<script src="assets/core.js?v=20261118234935"></script>
+<script src="assets/ui.js?v=20261118234935"></script>
 <script>
 UI.page({
   graphic: false, faceplate: false,

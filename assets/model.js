@@ -60,13 +60,14 @@ SZ.CTL = {
   'FFIC-103': { d: 'TEAL / donor ratio', u: 'g/g', lo: 0, hi: 100, act: 1, kc: 0.5, ti: 20, page: 'catalyst', dec: 1 },
   'FIC-201': { d: 'Fresh propylene feed to MZCR', u: 't/h', lo: 0, hi: 40, act: -1, kc: 0.6, ti: 6, page: 'mzcr', dec: 1 },
   'FIC-203': { d: 'Ethylene to MZCR (RACO)', u: 'kg/h', lo: 0, hi: 2500, act: -1, kc: 0.6, ti: 6, page: 'mzcr', dec: 0 },
-  'TIC-211': { d: 'MZCR temperature → E-211 CW', u: '°C', lo: 40, hi: 110, act: 1, kc: 6, ti: 150, td: 20, page: 'mzcr', dec: 1 },
+  'TIC-211': { d: 'MZCR temperature → E-211 CW', u: '°C', lo: 40, hi: 110, act: 1, kc: 6, ti: 150, td: 20, ppv: true, page: 'mzcr', dec: 1 },
+  'TIC-212': { d: 'MZCR heating → E-212 steam valve (start-up / shutdown only, heater must be running)', u: '°C', lo: 40, hi: 110, act: -1, kc: 10, ti: 600, ppv: true, page: 'mzcr', dec: 1 },
   'PIC-211': { d: 'MZCR pressure → split range: vent (0-30 %) / C3 make-up (30-100 %)', u: 'barg', lo: 0, hi: 40, act: -1, kc: 8, ti: 300, page: 'mzcr', dec: 2 },
   'AIC-211': { d: 'Riser H2 (GC) → H2 valve', u: 'mol%', lo: 0, hi: 10, act: -1, kc: 4, ti: 500, page: 'mzcr', dec: 2 },
   'FIC-212': { d: 'Barrier liquid C3 to downer', u: 't/h', lo: 0, hi: 12, act: -1, kc: 0.6, ti: 6, page: 'mzcr', dec: 2 },
   'HIC-213': { d: 'Solids circulation (hand)', u: '%', lo: 0, hi: 100, act: 0, hand: true, page: 'mzcr', dec: 0 },
   'PIC-301': { d: 'HP flash D-301 pressure', u: 'barg', lo: 0, hi: 30, act: 1, kc: 10, ti: 120, page: 'flash', dec: 2 },
-  'TIC-401': { d: 'GPR temperature → E-401 CW', u: '°C', lo: 40, hi: 110, act: 1, kc: 6, ti: 200, page: 'gpr', dec: 1 },
+  'TIC-401': { d: 'GPR temperature → E-401 CW', u: '°C', lo: 40, hi: 110, act: 1, kc: 6, ti: 200, ppv: true, page: 'gpr', dec: 1 },
   'PIC-401': { d: 'GPR pressure → C3 make-up', u: 'barg', lo: 0, hi: 25, act: -1, kc: 8, ti: 300, page: 'gpr', dec: 2 },
   'AIC-401': { d: 'GPR C2/(C2+C3) → C2 valve', u: 'mol/mol', lo: 0, hi: 1, act: -1, kc: 60, ti: 900, page: 'gpr', dec: 3 },
   'AIC-402': { d: 'GPR H2/C2 → H2 valve', u: 'mol/mol', lo: 0, hi: 0.2, act: -1, kc: 200, ti: 600, page: 'gpr', dec: 4 },
@@ -80,7 +81,7 @@ SZ.SPAN = SPAN;
 /* Final control elements: the control valve (or drive) each controller moves.
    FCV flow · TCV temperature · PCV pressure · LCV level · HCV hand. Split-range PCV-211: A = vent, B = make-up. */
 SZ.FCE = {
-  'FIC-201': 'FCV-201', 'FIC-203': 'FCV-203', 'FIC-212': 'FCV-212', 'TIC-211': 'TCV-211', 'PIC-211': 'PCV-211A/B',
+  'FIC-201': 'FCV-201', 'FIC-203': 'FCV-203', 'FIC-212': 'FCV-212', 'TIC-211': 'TCV-211', 'TIC-212': 'TCV-212', 'PIC-211': 'PCV-211A/B',
   'AIC-211': 'FCV-211', 'HIC-213': 'HCV-213', 'PIC-301': 'PCV-301', 'TIC-401': 'TCV-401', 'PIC-401': 'PCV-401',
   'AIC-401': 'FCV-401', 'AIC-402': 'FCV-402', 'LIC-401': 'LCV-401',
   'FIC-101': 'SC-101 (feeder speed)', 'FFIC-102': 'SC-102 (P-102 stroke)', 'FFIC-103': 'SC-103 (P-103 stroke)', 'LIC-601': 'SC-601 (EX-601 speed)'
@@ -92,7 +93,7 @@ SZ.EQ = {
   K401: { d: 'GPR cycle-gas compressor K-401', page: 'gpr' }, EX601: { d: 'Extruder EX-601', page: 'finishing' },
   TEALP: { d: 'TEAL dosing pump P-102', page: 'catalyst' }, CATF: { d: 'Catalyst feeder D-101', page: 'catalyst' },
   DONP: { d: 'Donor dosing pump P-103', page: 'catalyst' }, STEAM: { d: 'Steamer D-501 steam', page: 'finishing' },
-  HTR: { d: 'Start-up heater E-212 (steam heater on cycle gas, 4 MW) — needs K-211 running, trips at 85 °C', page: 'mzcr' }
+  HTR: { d: 'Start-up heater E-212 (steam heater on cycle gas, 0–4 MW set by TIC-212 / TCV-212) — needs K-211 running, trips at 85 °C', page: 'mzcr' }
 };
 // plant "down" states used for state-based alarm suppression and start-up/shutdown
 SZ.isIdle = (S) => S.p.prodTot < 1 && S.p.catMeas < 0.02;   // no reaction, no catalyst
@@ -100,6 +101,16 @@ SZ.isLow = (S) => S.p.prodTot < 5;                            // starting up / s
 
 /* ---------------- 2. STATE FACTORY ---------------- */
 function mkCtl(tag, sp, op, mode) { return { pv: sp, sp: sp, op: op, mode: mode || 'AUTO', e1: 0, e2: 0 }; }
+SZ.mkCtl = mkCtl;
+// saved plants from older versions: add controllers that did not exist yet
+SZ.upgradeState = function (S) {
+  if (!S || !S.ctl) return S;
+  for (const tag in SZ.CTL) if (!S.ctl[tag]) {
+    const T = S.p && S.p.T211 || 80;
+    S.ctl[tag] = mkCtl(tag, T, tag === 'TIC-212' ? 100 : 0, 'MAN');   // heater controller: MAN 100 % = the old fixed 4 MW
+  }
+  return S;
+};
 
 SZ.newState = function (grade) {
   const g = SZ.GRADES[grade] || SZ.GRADES['H-INJ'];
@@ -116,6 +127,7 @@ SZ.newState = function (grade) {
   };
   for (const tag in SZ.CTL) S.ctl[tag] = mkCtl(tag, 0, 0, 'AUTO');
   S.ctl['HIC-213'].mode = 'MAN';
+  S.ctl['TIC-212'].sp = g.T - 2;   // heater controller waits in AUTO, 2 °C below TIC-211 (it only acts while E-212 runs)
   const p = S.p;
   Object.assign(p, {
     catAct: 0.6, catMeas: 0.6, teal: 3, donor: 0.3, c1: 0.6, c2: 0.6, hold: 0.6 * K.tauMZ / 3600,
@@ -141,20 +153,25 @@ function pidStep(c, def, pv, dt) {
   if (def.hand) { c.mode = 'MAN'; return; }
   const span = def.hi - def.lo;
   const e = (pv - c.sp) / span * 100 * def.act;       // % of span; positive → increase OP
+  const y = pv / span * 100 * def.act;                 // PV in % of span (for P and D on PV)
+  if (c.y1 == null) c.y1 = y;
   if (c.mode === 'AUTO') {
     const ti = def.ti || 1e9, td = def.td || 0;
-    // derivative acts on a filtered error (like a real DCS PID) so transmitter jitter does not kick the valve
-    const tf = Math.max(4, td / 4);
-    c.ef = c.ef == null ? e : c.ef + (e - c.ef) * Math.min(1, dt / tf);
+    // derivative acts on a filtered signal (like a real DCS PID) so transmitter jitter does not kick the valve.
+    // ppv loops (temperatures) use "I on error, P and D on PV": an SP change moves the output smoothly (integral
+    // only) instead of a step kick of Kc × ΔSP — a large kick on TIC-211 would dump the reactor temperature.
+    const tf = Math.max(4, td / 4), ds = def.ppv ? y : e;
+    c.ef = c.ef == null ? ds : c.ef + (ds - c.ef) * Math.min(1, dt / tf);
     const f1 = c.f1 == null ? c.ef : c.f1, f2 = c.f2 == null ? f1 : c.f2;
-    const dOP = def.kc * ((e - c.e1) + dt / ti * e + td / dt * (c.ef - 2 * f1 + f2));
+    const dP = def.ppv ? y - c.y1 : e - c.e1;
+    const dOP = def.kc * (dP + dt / ti * e + td / dt * (c.ef - 2 * f1 + f2));
     c.op = clamp(c.op + dOP, 0, 100);
     c.f2 = f1; c.f1 = c.ef;
   } else {
     c.sp = pv;   // PV tracking in MAN gives bumpless MAN→AUTO
     c.ef = c.f1 = c.f2 = null;
   }
-  c.e2 = c.e1; c.e1 = e;
+  c.e2 = c.e1; c.e1 = e; c.y1 = y;
 }
 SZ.pidStep = pidStep;
 
@@ -251,10 +268,13 @@ SZ.step = function (S, dt) {
   p.Qf = (p.F201 + p.F212 + p.Fmk) * 1000 * (0.30 + 0.0025 * (p.T211 - 25)) / 3600 * (1 + N.qf);
   p.Qc = K.UA211 * C['TIC-211'].op / 100 * Math.max(0, p.T211 - p.cwT) * cwf * k211f * (1 - 0.6 * p.foul / 100);
   if (E.HTR && !E.K211) { SZ.tripEq(S, 'HTR', 'No cycle-gas flow (K-211 stopped). Restart K-211 before the heater.'); SZ.log(S, 'SIS', 'E-212 start-up heater tripped: no cycle-gas flow (K-211 stopped)'); }
-  p.Qh = E.HTR ? 4.0 : 0;                          // start-up heater duty, MW
+  // start-up heater duty, MW: TIC-212 throttles the E-212 steam valve TCV-212 (0-100 % → 0-4 MW, ~1 min response)
+  p.Qh = lag(p.Qh || 0, E.HTR ? 4.0 * C['TIC-212'].op / 100 : 0, 60, dt);
   const Qloss = 0.004 * (p.T211 - 25);             // ambient heat loss, MW
   p.T211 += (p.Qr + p.Qh - p.Qf - p.Qc - Qloss) / K.C211 * dt;
   pidStep(C['TIC-211'], D['TIC-211'], p.T211, dt);
+  // heater controller: output frozen while E-212 is stopped (no wind-up), so a restart is smooth
+  const op212 = C['TIC-212'].op; pidStep(C['TIC-212'], D['TIC-212'], p.T211, dt); if (!E.HTR) C['TIC-212'].op = op212;
   // pressure (gas inventory)
   const disGas = 0.1 * p.rMZ + 0.3;
   p.P211 = clamp(p.P211 + (p.F201 + p.F212 + p.Fmk + p.F203 / 1000 + N.gas - p.rMZ - disGas - p.Fvent) * 0.0012 * dt, 0, 45);
@@ -466,7 +486,7 @@ SZ.sis = function (S, dt) {
     s.kill = 'INJECTED'; s.lastTrip = why; SZ.log(S, 'SIS', 'CO KILL XV-901 INJECTED — ' + why); if (S.p.P211 > 10) SZ.flareBurst(S, 15); SZ.alert(S, 'sis', 'XV-901', 'SIS TRIP — CO KILL INJECTED', why + '. Reaction stopped. Find the cause, then follow the restart checklist (manual §8.7).');
     S.ctl['FIC-101'].mode = 'MAN'; S.ctl['FIC-101'].op = 0;
   };
-  if (E.HTR && p.T211 >= 85) { SZ.tripEq(S, 'HTR', 'TSH-212 high temperature: R-211 reached 85 °C. Stop the heater after light-off (> 5 t/h).'); SZ.log(S, 'SIS', 'TSH-212 E-212 start-up heater tripped at 85 °C'); }
+  if (E.HTR && p.T211 >= 85) { SZ.tripEq(S, 'HTR', 'TSH-212 high temperature: R-211 reached 85 °C. Put TIC-212 in AUTO at recipe − 2 °C (78) so the heater throttles itself instead of running flat out; stop it after light-off (> 5 t/h, TIC-212 OP < 10 %).'); SZ.log(S, 'SIS', 'TSH-212 E-212 start-up heater tripped at 85 °C'); }
   if (p.T211 >= 92) trip('TZHH-211 MZCR temperature ≥ 92 °C');
   if (E.GPR && p.T401 >= 95) trip('TZHH-401 GPR temperature ≥ 95 °C');
   if (s.k211StopT > 60) trip('K-211 stopped > 60 s');
@@ -500,6 +520,7 @@ SZ.recipeItems = function (grade) {
     ['TEAL/cat FFIC-102', 'FFIC-102', r.tealCat, 'g/g'],
     ['TEAL/donor FFIC-103', 'FFIC-103', r.tealDon, 'g/g'],
     ['MZCR T TIC-211', 'TIC-211', r.T, '°C'],
+    ['Heater E-212 TIC-212', 'TIC-212', r.T - 2, '°C'],
     ['MZCR P PIC-211', 'PIC-211', r.P, 'barg'],
     ['Riser H2 AIC-211', 'AIC-211', r.H2r, 'mol%'],
     ['Barrier FIC-212', 'FIC-212', r.barrier, 't/h'],

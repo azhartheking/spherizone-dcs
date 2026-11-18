@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="forms.css">
 <style>@page{size:A4 portrait;margin:0}</style>
 </head>
-<body class="portrait" data-doc="SZ-OPS-CL-001" data-rev="1.4" data-unit="Unit 200 · Spherizone PP (training plant)">
+<body class="portrait" data-doc="SZ-OPS-CL-001" data-rev="1.5" data-unit="Unit 200 · Spherizone PP (training plant)">
 <div class="noprint">Print with <b>Ctrl+P → Save as PDF</b>, A4 portrait, margins <b>None</b>, "Background graphics" ON. Or use the ready PDF in the project folder.</div>
 
 <!-- ===================== PAGE 1 — COVER & DOCUMENT CONTROL ===================== -->
 <div class="sheet" data-t="Start-up and Shutdown Checklists" data-s="Document control and instructions for use">
 <h1 style="margin-top:4mm">Start-up and Shutdown Checklists</h1>
-<p style="font-size:11pt">Spherizone PP plant — multizone circulating reactor R-211 with gas-phase reactor R-401<br><span class="mut">Operating checklists for the DCS training simulator · use with the Student Manual v1.4, chapter 8</span></p>
+<p style="font-size:11pt">Spherizone PP plant — multizone circulating reactor R-211 with gas-phase reactor R-401<br><span class="mut">Operating checklists for the DCS training simulator · use with the Student Manual v1.6, chapter 8</span></p>
 
 <h2>Contents</h2>
 <table class="t">
@@ -30,7 +30,7 @@
 <table class="t">
 <tr><th style="width:25%">Item</th><th style="text-align:left">Detail</th></tr>
 <tr><td>Document number</td><td>SZ-OPS-CL-001</td></tr>
-<tr><td>Revision</td><td>1.4 — matches simulator and Student Manual v1.4 (November 2026)</td></tr>
+<tr><td>Revision</td><td>1.5 — matches simulator 1.6 and Student Manual v1.6 (November 2026): start-up heater on TIC-212</td></tr>
 <tr><td>Applies to</td><td>Areas 100 (catalyst), 200 (MZCR R-211), 300 (HP flash), 400 (GPR R-401), 500/600 (finishing)</td></tr>
 <tr><td>Grades covered</td><td>H-RAFFIA, H-INJ, H-FIBER, H-BOPP (homopolymer) · R-7 (random copolymer). HECO I-12 is reached by grade change after start-up (manual §7.5).</td></tr>
 </table>
@@ -113,7 +113,7 @@
 <tr><td class="n">2a</td><td>Lube oil, seal gas and suction knock-out drum checked <span class="field f">FIELD</span></td><td class="tag">K-211</td><td class="c">—</td><td>Field confirms by radio</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr><td class="n">3</td><td>Set solids circulation (hand station) <span class="field dcs">DCS</span></td><td class="tag">HIC-213</td><td class="c">OP 55 %</td><td>Particle flow shown in riser and downer</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr class="ph"><td colspan="9">PHASE B — Heat-up</td></tr>
-<tr><td class="n">4</td><td>Start start-up heater. Keep TIC-211 in MAN, OP 0 %. Keep PIC-211 SP ≤ 5 barg <span class="field dcs">DCS</span></td><td class="tag">E-212<br>TIC-211</td><td class="c">T ≥ 75 °C<br><span class="small mut">(step ticks at 70)</span></td><td>"Heater ON 4 MW". T rises ≈ 0.8 °C/min. Record T every 15 min below</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">4</td><td>Start start-up heater. TIC-212 → AUTO at recipe − 2 °C. Keep TIC-211 in MAN, OP 0 %. Keep PIC-211 SP ≤ 5 barg <span class="field dcs">DCS</span></td><td class="tag">E-212<br>TIC-212<br>TIC-211</td><td class="c">TIC-212 SP <b>78</b> (R-7 <b>73</b>)<br>T ≥ 75 °C<br><span class="small mut">(step ticks at 70)</span></td><td>"Heater ON 4.0 MW", TCV-212 100 %. T rises ≈ 0.8 °C/min; TCV-212 closes near SP. Record T every 15 min below</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr><td colspan="9" class="small">Heat-up record — time / TIC-211 PV (°C): &nbsp;___/___ &nbsp; ___/___ &nbsp; ___/___ &nbsp; ___/___ &nbsp; ___/___ &nbsp; ___/___ &nbsp; ___/___</td></tr>
 <tr class="ph"><td colspan="9">PHASE C — Pressurise and line up</td></tr>
 <tr><td class="n">5</td><td>PIC-211 → AUTO. Raise SP in stages; before each raise confirm the dew-point margin &gt; 3 bar <span class="field dcs">DCS</span></td><td class="tag">PIC-211</td><td class="c">10 → 18 → 24 →<br><b>28 barg</b> (R-7: <b>27</b>)</td><td>PIC-211 OP &gt; 30 % (make-up side). Safe max: 26 barg at 70 °C, 30 barg at 75 °C</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
@@ -138,8 +138,8 @@ T ____ °C &nbsp; P ____ barg &nbsp; margin ____ bar &nbsp;&nbsp; Supervisor: __
 <tr class="hp"><td class="n hpl">HP2</td><td colspan="8"><span class="hpbadge">HOLD POINT 2</span> <b>Authorisation for catalyst injection</b> — HP1 conditions still met · TEAL/donor in AUTO at SP · barrier and H₂ at SP · SIS NORMAL · XV-901 NORMAL · laboratory ready for first sample.<br>
 Supervisor: ______________________ &nbsp; Time: ________</td></tr>
 <tr class="ph"><td colspan="9">PHASE E — Light-off</td></tr>
-<tr><td class="n">10</td><td>Start catalyst feeder D-101. FIC-101 → AUTO at the light-off rate. TIC-211 → AUTO <span class="field dcs">DCS</span></td><td class="tag">FIC-101<br>TIC-211</td><td class="c"><b>0.2 kg/h</b><br><b>80 °C</b> (R-7: <b>75</b>)</td><td>Catalyst ≈ 0.2 kg/h. Production appears after ≈ 30 min. TIC-211 in AUTO</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
-<tr><td class="n">11</td><td>Reaction lit off: stop the start-up heater <span class="field dcs">DCS</span></td><td class="tag">E-212</td><td class="c">at prod. &gt; 5 t/h</td><td>Heat of reaction &gt; 3 MW. TIC-211 opens E-211 to hold SP</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">10</td><td>Start catalyst feeder D-101. FIC-101 → AUTO at the light-off rate. TIC-211 → AUTO <span class="field dcs">DCS</span></td><td class="tag">FIC-101<br>TIC-211</td><td class="c"><b>0.2 kg/h</b><br><b>80 °C</b> (R-7: <b>75</b>)</td><td>Catalyst ≈ 0.2 kg/h. Production appears after ≈ 30 min. TIC-211 in AUTO. Heater stays on: TIC-212 OP falls as reaction heat grows</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">11</td><td>Reaction lit off: stop the start-up heater <span class="field dcs">DCS</span></td><td class="tag">E-212<br>TIC-212</td><td class="c">prod. &gt; 5 t/h<br><b>and</b> TIC-212 OP &lt; 10 %</td><td>Heat of reaction &gt; 3 MW. T stays at SP; TIC-211 opens E-211 above SP. Never stop the heater while TIC-212 OP is high</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr class="ph"><td colspan="9">PHASE F — Finishing on line</td></tr>
 <tr><td class="n">12</td><td>Steam to D-501 ON. When silo &gt; 20 %: start EX-601, LIC-601 → AUTO <span class="field dcs">DCS</span></td><td class="tag">D-501<br>EX-601<br>LIC-601</td><td class="c">ON<br>RUN<br><b>50 %</b></td><td>Extruder rate follows production; silo level steady</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr><td class="n">12a</td><td>Additive feeders filled and set; pellet water, dryer and bagging running <span class="field f">FIELD</span></td><td class="tag">EX-601</td><td class="c">per recipe</td><td>Field confirms by radio</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
@@ -169,7 +169,7 @@ Supervisor: ______________________ &nbsp; Time: ________ &nbsp; → continue log
 <tr class="ph"><td colspan="9">PHASE B — Feed down, hold temperature</td></tr>
 <tr><td class="n">3</td><td>Keep fresh C₃ SP ≈ 0.7 × production</td><td class="tag">FIC-201</td><td class="c">30→21, 15→10, 5→3.5 t/h</td><td>Production &lt; 15 t/h with FIC-201 ≤ 0.8 × prod. + 2</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr><td colspan="9" class="small">Feed-down record — time / production t/h / FIC-201 SP / TIC-211 PV / dew margin: &nbsp; ___/___/___/___/___ &nbsp; ___/___/___/___/___ &nbsp; ___/___/___/___/___ &nbsp; ___/___/___/___/___</td></tr>
-<tr><td class="n">4</td><td>Below 10 t/h start the heater; keep TIC-211 in AUTO</td><td class="tag">E-212</td><td class="c">ON</td><td>TIC-211 holds SP. Dew margin &gt; 3 bar</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">4</td><td>Below 10 t/h start the heater, TIC-212 AUTO; keep TIC-211 in AUTO</td><td class="tag">E-212<br>TIC-212</td><td class="c">ON · SP 78 (R-7 73)</td><td>TIC-212 OP rises as reaction fades. T near SP. Dew margin &gt; 3 bar</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr><td class="n">5</td><td>Wait for the reaction to die away</td><td class="tag">R-211</td><td class="c">&lt; 2 t/h</td><td>Heat of reaction ≈ 0</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr class="ph"><td colspan="9">PHASE C — Isolate chemicals and feeds</td></tr>
 <tr><td class="n">6</td><td>GPR routing to BYPASS</td><td class="tag">HS-302</td><td class="c">BYPASS</td><td>Powder routes to D-501</td><td class="w"></td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
@@ -219,7 +219,7 @@ Use when the reaction can no longer be held: TIC-211 OP at 100 % with T still ri
 <h2>Hot standby — park and restart</h2>
 <table class="t">
 <tr><th>#</th><th style="text-align:left">Action</th><th style="text-align:left">Verify</th><th>✓</th><th>Time</th><th>Init</th></tr>
-<tr><td class="n">S1</td><td>Park: shutdown steps 1–9 (SZ-CL-03), then stop. Keep E-212 on with TIC-211 in AUTO; PIC-211 at normal SP</td><td>T at SP, dew margin &gt; 3 bar, K-211 + P-701 running</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
+<tr><td class="n">S1</td><td>Park: shutdown steps 1–9 (SZ-CL-03), then stop. Keep E-212 on with TIC-212 and TIC-211 in AUTO; PIC-211 at normal SP</td><td>T at SP, dew margin &gt; 3 bar, K-211 + P-701 running</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr><td class="n">S2</td><td>While parked, record T, P and dew margin every hour on the log sheet</td><td>No dew-margin alarm</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 <tr><td class="n">S3</td><td>Restart: start-up steps 7–14 (SZ-CL-02). Check T ≥ 72 °C and margin &gt; 3 bar first</td><td>Production building; on-spec</td><td class="box"></td><td class="w"></td><td class="w"></td></tr>
 </table>
@@ -241,6 +241,7 @@ Use when the reaction can no longer be held: TIC-211 OP at 100 % with T still ri
 <tr><td class="tag">AIC-211</td><td>Riser H₂ (mol%)</td><td class="c">0.97</td><td class="c">2.98</td><td class="c">2.36</td><td class="c">1.04</td><td class="c">1.75</td><td class="c">9</td></tr>
 <tr><td class="tag">FIC-101</td><td>Catalyst start-up → final (kg/h)</td><td class="c">0.2→0.62</td><td class="c">0.2→0.59</td><td class="c">0.2→0.60</td><td class="c">0.2→0.50</td><td class="c">0.2→0.70</td><td class="c">10 → 13</td></tr>
 <tr><td class="tag">TIC-211</td><td>MZCR temperature</td><td class="c">80</td><td class="c">80</td><td class="c">80</td><td class="c">80</td><td class="c">75 °C</td><td class="c">10</td></tr>
+<tr><td class="tag">TIC-212</td><td>Heater E-212 (recipe − 2 °C)</td><td class="c">78</td><td class="c">78</td><td class="c">78</td><td class="c">78</td><td class="c">73 °C</td><td class="c">4</td></tr>
 <tr><td class="tag">FIC-203</td><td>Ethylene (RACO only)</td><td class="c">0</td><td class="c">0</td><td class="c">0</td><td class="c">0</td><td class="c">1167 kg/h</td><td class="c">13</td></tr>
 <tr><td class="tag">LIC-601</td><td>Silo level</td><td class="c" colspan="5">50 %</td><td class="c">12</td></tr>
 </table>

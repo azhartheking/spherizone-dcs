@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Spherizone DCS — 200 MZCR</title>
-<link rel="stylesheet" href="assets/dcs.css?v=20261118194626">
+<link rel="stylesheet" href="assets/dcs.css?v=20261118234935">
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#9b9ea1"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body data-page="mzcr">
 <div id="hdr"></div>
 <div id="main"><section id="view"></section><aside id="side"></aside></div>
 <div id="banner"></div>
-<script src="assets/model.js?v=20261118194626"></script>
-<script src="assets/core.js?v=20261118194626"></script>
-<script src="assets/ui.js?v=20261118194626"></script>
+<script src="assets/model.js?v=20261118234935"></script>
+<script src="assets/core.js?v=20261118234935"></script>
+<script src="assets/ui.js?v=20261118234935"></script>
 <script>
 const fx = UI.fx;
 UI.page({
@@ -44,9 +44,14 @@ UI.page({
     d.hx(300, 180, ''); d.label(326, 184, 'E-211', 'lbl');
     d.pipe([[300, 196], [300, 540], [418, 540]], 'gas');
     d.motor(300, 250, 'HTR', 'heat', '');
-    d.label(320, 248, 'E-212', 'lbl');
-    d.dyn(320, 261, S => S.eq.HTR ? 'heater ON ' + fx(S.p.Qh, 0) + ' MW' : 'start-up htr', 'lbl s');
-    d.label(306, 300, 'cycle gas', 'lbl s');
+    // LP steam to the start-up heater through TCV-212 (TIC-212 throttles the heater duty 0-4 MW)
+    d.pipe([[395, 250], [314, 250]], 'steam');
+    d.label(372, 237, 'LP steam', 'lbl s', 'middle');
+    d.valve(360, 250, 'TIC-212', false);
+    d.label(318, 298, 'E-212', 'lbl');
+    d.dyn(318, 311, S => S.eq.HTR ? 'heater ON ' + fx(S.p.Qh, 1) + ' MW' : 'start-up htr', 'lbl s');
+    d.label(306, 330, 'cycle gas', 'lbl s');
+    d.tag(100, 200, 'TIC-212');
     // ---- cooling water + TIC-211
     d.motor(180, 270, 'P701', 'pump', 'P-701');
     d.pipe([[194, 270], [240, 270], [240, 180], [282, 180]], 'cw');
