@@ -18,7 +18,21 @@ UI.PAGES = [
   ['index', 'Overview'], ['catalyst', '100 Catalyst'], ['mzcr', '200 MZCR'], ['flash', '300 Flash'], ['gpr', '400 GPR'],
   ['finishing', '500 Finishing & Silo'], ['extrusion', '600 Extrusion'], ['utilities', '900 Utilities & Flare'], ['trends', 'Trends'], ['alarms', 'Alarms & Journal'], ['quality', 'Quality & Grades'], ['instructor', 'Instructor'], ['manual', 'Manual']
 ];
-UI.href = (id, tag) => id + '.html' + (tag ? '#' + encodeURIComponent(tag) : '');
+// Page addresses. In the single-file offline version (window.SZ_SINGLE) every page lives in one HTML file
+// and is chosen with ?p=<page>; documents (PDFs, printable forms) then open from the online site.
+UI.ONLINE = 'https://azhartheking.github.io/spherizone-dcs/';
+UI.href = (id, tag) => (window.SZ_SINGLE ? '?p=' + id : id + '.html') + (tag ? '#' + encodeURIComponent(tag) : '');
+UI.resolve = (h) => {
+  if (!window.SZ_SINGLE || !h) return h;
+  if (/^(docs|forms)\//.test(h)) return UI.ONLINE + h;
+  const m = /^([\w-]+)\.html(\?[^#]*)?(#.*)?$/.exec(h);
+  return m ? '?p=' + m[1] + (m[2] ? '&' + m[2].slice(1) : '') + (m[3] || '') : h;
+};
+if (window.SZ_SINGLE) document.addEventListener('click', (e) => {
+  const a = e.target.closest && e.target.closest('a[href]'); if (!a) return;
+  const h = a.getAttribute('href'), r = UI.resolve(h);
+  if (r !== h) { e.preventDefault(); if (/^https?:/.test(r)) window.open(r, '_blank'); else location.href = r; }
+}, true);
 // which page owns each tag (for cross-page jumps)
 UI.TAGPAGE = {};
 for (const t in SZ.CTL) UI.TAGPAGE[t] = SZ.CTL[t].page;
@@ -215,12 +229,12 @@ function kit(svg) {
     const p = dir === 'l' ? `M${x},${y} L${x + 10},${y - 11} L${x + w},${y - 11} L${x + w},${y + 11} L${x + 10},${y + 11} Z` : `M${x},${y - 11} L${x + w - 10},${y - 11} L${x + w},${y} L${x + w - 10},${y + 11} L${x},${y + 11} Z`;
     sv('path', { d: p }, g);
     const t = sv('text', { x: x + w / 2 + (dir === 'l' ? 4 : -4), y: y + 3.5, 'text-anchor': 'middle' }, g); t.textContent = text;
-    g.addEventListener('click', () => location.href = href);
+    g.addEventListener('click', () => location.href = UI.resolve(href));
     return g;
   };
   d.area = (x, y, w, hh, title, href) => {
     const r = sv('rect', { x, y, width: w, height: hh, rx: 3, class: 'area-r' }, L.bg);
-    r.addEventListener('click', () => location.href = href);
+    r.addEventListener('click', () => location.href = UI.resolve(href));
     const t = sv('text', { x: x + 8, y: y + 16, class: 'lbl area' }, L.bg); t.textContent = title;
     return r;
   };
@@ -251,6 +265,8 @@ UI.select = function (tag) {
   UI.sel = tag; try { sessionStorage.setItem('szsel.' + UI.pageId, tag); } catch (e) { }
   history.replaceState(null, '', '#' + encodeURIComponent(tag));
   buildFaceplate();
+  // phones / small tablets: the faceplate slides up from the bottom as a sheet
+  const fp = $('#fp'); if (fp && window.matchMedia('(max-width: 1000px)').matches) fp.classList.add('sheet');
   SZ.render();
 };
 let fpBinds = [];
@@ -621,7 +637,7 @@ UI.audio = (function () {
    that follows the same live simulation — put alarms or trends on a second screen.   */
 UI.isPop = new URLSearchParams(location.search).has('pop');
 UI.popout = function (page, hash, w, hh) {
-  const url = page + '.html?pop=1' + (hash ? '#' + hash : '');
+  const url = UI.resolve(page + '.html?pop=1' + (hash ? '#' + hash : ''));
   const win = window.open(url, 'sz_pop_' + page + (hash || ''), 'popup=yes,width=' + (w || 980) + ',height=' + (hh || 640));
   if (win) win.focus(); else location.href = url;   // pop-ups blocked → open here
 };
@@ -673,6 +689,21 @@ UI.alertUpdate = function (S) {
    10 min; if a newer version has been published, a banner offers to reload. Browsers that support it
    show an INSTALL APP button so the simulator gets its own window and desktop icon.              */
 UI.appInit = function () {
+  if (window.SZ_SINGLE) {                                       // single-file offline copy: just tell the user if a newer one is online
+    setTimeout(async () => {
+      try {
+        const j = await (await fetch(UI.ONLINE + 'version.json?t=' + Date.now(), { cache: 'no-store' })).json();
+        if (j && j.ver > SZ.CODE_VER && !$('#szupd') && !UI.isPop) {
+          const b = h('div', { id: 'szupd' }, '<b>Newer version ' + (j.label || j.ver) + ' is online</b><span>' + (j.notes || '') + '</span>');
+          b.append(h('button', { class: 'on', on: { click: () => window.open(UI.ONLINE, '_blank') } }, 'Open online version'),
+            h('button', { on: { click: () => window.open(UI.ONLINE + 'docs/Spherizone-DCS-Simulator-offline.html', '_blank') } }, 'Download new single file'),
+            h('button', { on: { click: () => b.remove() } }, 'Later'));
+          document.body.append(b);
+        }
+      } catch (e) { }                                             // offline: nothing to check
+    }, 5000);
+    return;
+  }
   if (!/^https?:/.test(location.protocol)) return;            // opened from a folder (file://): no app features
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
   const check = async () => {
@@ -714,7 +745,10 @@ UI.page = function (cfg) {
   if (cfg.body) cfg.body(view);
   if (side) {
     if (UI.pageId !== 'manual') side.append(UI.sessionCard());
-    if (cfg.faceplate !== false) { const fp = UI.card('Faceplate'); fp.id = 'fp'; side.append(fp); }
+    if (cfg.faceplate !== false) {
+      const fp = UI.card('Faceplate', ' <button class="fpclose" title="Close faceplate">✕ close</button>'); fp.id = 'fp'; side.append(fp);
+      fp.querySelector('.fpclose').addEventListener('click', () => fp.classList.remove('sheet'));
+    }
     (cfg.side || ['kpi']).forEach(s => { if (typeof s === 'function') side.append(s()); else if (s === 'kpi') side.append(UI.kpiCard()); else if (s.startsWith('trend:')) side.append(UI.trendCard(s.slice(6))); else if (typeof s === 'function') side.append(s()); });
   }
   buildBanner();

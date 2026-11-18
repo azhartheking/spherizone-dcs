@@ -1,7 +1,7 @@
 /* Spherizone DCS simulator — service worker
    Network first: when online every page and script is fetched fresh, so users always get the newest
    published version. A copy is kept in the cache so the simulator also works offline.               */
-const CACHE = 'szdcs-152';
+const CACHE = 'szdcs-153';
 const CORE = ['./', 'index.html', 'catalyst.html', 'mzcr.html', 'flash.html', 'gpr.html', 'finishing.html', 'extrusion.html',
   'utilities.html', 'trends.html', 'alarms.html', 'quality.html', 'instructor.html', 'manual.html',
   'assets/dcs.css', 'assets/model.js', 'assets/core.js', 'assets/ui.js', 'manifest.webmanifest',

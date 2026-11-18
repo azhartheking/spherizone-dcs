@@ -256,3 +256,28 @@ a.popa{text-decoration:none;margin-left:8px;font-weight:600}
 #szupd span{color:var(--mut)}
 #szupd button{align-self:flex-start}
 
+
+/* ---------- phones and small tablets ---------- */
+.fpclose{display:none;padding:2px 8px}
+@media (max-width:1000px){
+  #hdr{position:static}
+  .hrow{gap:5px;padding:4px 8px}
+  .brand small{display:none}
+  nav.pages{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 6px}
+  nav.pages a{flex:0 0 auto;white-space:nowrap;padding:7px 12px}
+  #main{padding:6px;gap:6px}
+  .gfxwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .gfxwrap svg.gfx{min-width:960px}
+  .gfxwrap::after{content:"← swipe the graphic sideways · tap a tag to open its faceplate →";display:block;text-align:center;font-size:11px;color:var(--mut);padding:3px 0}
+  button{min-height:32px}
+  input,select{font-size:16px}
+  .panels{grid-template-columns:1fr}
+  #fp.sheet{position:fixed;left:0;right:0;bottom:0;z-index:120;max-height:62vh;overflow:auto;border-radius:12px 12px 0 0;box-shadow:0 -8px 28px rgba(0,0,0,.4)}
+  #fp.sheet .fpclose{display:inline-block}
+  #banner{font-size:11px;min-height:0}
+  #banner td{white-space:normal}
+  table.t{font-size:11px}
+  .tgrid{grid-template-columns:1fr!important}
+  #szalert{padding-top:8vh}
+  .popmenu{right:auto;left:0}
+}
