@@ -2,7 +2,7 @@
 
 A browser-based control-room (DCS) training simulator of a polypropylene plant with a multizone circulating reactor (Spherizone-type process): start-up from cold, grade changes, trips, PSV relief and flaring, shutdown.
 
-**Open it:** use the GitHub Pages link of this repository. It works in Microsoft Edge or Google Chrome, can be installed as an app (⬇ INSTALL APP), works offline and updates automatically.
+**Open it:** https://azhartheking.github.io/spherizone-dcs/ — It works in Microsoft Edge or Google Chrome, can be installed as an app (⬇ INSTALL APP), works offline and updates automatically.
 
 Documents: [Student manual](docs/) · printable [checklists](forms/checklists.html) and [operator log sheet](forms/logsheet.html).
 
