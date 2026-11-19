@@ -1,1 +1,1 @@
-{"label":"1.6.1","date":"2026-11-19","notes":"TIC-212 shows standby while heater is off; upgraded saves keep heater controller in AUTO","ver":161}
+{"ver":162,"label":"1.6.2","date":"2026-11-19","notes":"All plants link to the simulator hub (alkylation, Spherizone PP, CDU)"}

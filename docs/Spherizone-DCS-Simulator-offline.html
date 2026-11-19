@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Spherizone PP plant DCS training simulator — single-file offline version 1.6.1 (2026-11-19).
+<!-- Spherizone PP plant DCS training simulator — single-file offline version 1.6.2 (2026-11-19).
      Open by double-click in Microsoft Edge or Google Chrome. Online, always latest: https://azhartheking.github.io/spherizone-dcs/
      Training model — not licensor data. Not affiliated with LyondellBasell; Spherizone is their trademark. -->
 <html lang="en">
@@ -1293,7 +1293,7 @@ function becomeLeader() {
   rt.S = S; rt.last = Date.now(); saveState();
 }
 // code version: a tab running newer simulator code always takes over from a tab with older code
-SZ.CODE_VER = 161;
+SZ.CODE_VER = 162;
 function heartbeat() { lsSet(LKEY, JSON.stringify({ id: rt.id, ts: Date.now(), ver: SZ.CODE_VER })); }
 function drainQueue() {
   const q = parse(lsGet(QKEY)); if (!q || !q.length) return; lsSet(QKEY, '[]');
@@ -1425,6 +1425,7 @@ function buildHeader() {
   r1.append(h('div', { class: 'brand' }, 'SPHERIZONE PP · DCS<small>Multizone circulating reactor training simulator</small>'));
   const grade = h('div', { class: 'chip', title: 'Target grade (set on Quality & Grades)' });
   UI.bind(grade, (S) => { grade.innerHTML = 'Target <b>' + S.target + '</b> · ' + (SZ.GRADES[S.target] || {}).fam + ' · pellets ' + (S.p.pelOk ? '<b style="color:var(--ok)">ON-SPEC</b>' : '<b style="color:var(--p1)">OFF-SPEC</b>'); });
+  r1.append(h('a', { class: 'chip np', href: 'https://azhartheking.github.io/plant-simulators/', title: 'Back to the plant selection page (Alkylation · Spherizone PP · CDU)', style: 'text-decoration:none;color:inherit' }, '⌂ All plants'));
   r1.append(grade, h('div', { class: 'spacer' }));
   const role = h('div', { class: 'chip', title: 'Only one open page integrates the model; other open tabs follow it' });
   UI.bind(role, () => { const o = SZ.rt.outdated; role.textContent = o ? '⚠ OLD VERSION — press Ctrl+F5' : SZ.rt.leader ? 'SIM ●' : 'SIM ○ follower'; role.style.background = o ? 'var(--p2)' : ''; role.style.fontWeight = o ? '700' : ''; });

@@ -60,6 +60,7 @@ function buildHeader() {
   r1.append(h('div', { class: 'brand' }, 'SPHERIZONE PP · DCS<small>Multizone circulating reactor training simulator</small>'));
   const grade = h('div', { class: 'chip', title: 'Target grade (set on Quality & Grades)' });
   UI.bind(grade, (S) => { grade.innerHTML = 'Target <b>' + S.target + '</b> · ' + (SZ.GRADES[S.target] || {}).fam + ' · pellets ' + (S.p.pelOk ? '<b style="color:var(--ok)">ON-SPEC</b>' : '<b style="color:var(--p1)">OFF-SPEC</b>'); });
+  r1.append(h('a', { class: 'chip np', href: 'https://azhartheking.github.io/plant-simulators/', title: 'Back to the plant selection page (Alkylation · Spherizone PP · CDU)', style: 'text-decoration:none;color:inherit' }, '⌂ All plants'));
   r1.append(grade, h('div', { class: 'spacer' }));
   const role = h('div', { class: 'chip', title: 'Only one open page integrates the model; other open tabs follow it' });
   UI.bind(role, () => { const o = SZ.rt.outdated; role.textContent = o ? '⚠ OLD VERSION — press Ctrl+F5' : SZ.rt.leader ? 'SIM ●' : 'SIM ○ follower'; role.style.background = o ? 'var(--p2)' : ''; role.style.fontWeight = o ? '700' : ''; });
