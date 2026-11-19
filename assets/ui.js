@@ -63,7 +63,24 @@ function buildHeader() {
   r1.append(h('a', { class: 'chip np', href: 'https://azhartheking.github.io/plant-simulators/', title: 'Back to the plant selection page (Alkylation · Spherizone PP · CDU)', style: 'text-decoration:none;color:inherit' }, '⌂ All plants'));
   r1.append(grade, h('div', { class: 'spacer' }));
   const role = h('div', { class: 'chip', title: 'Only one open page integrates the model; other open tabs follow it' });
-  UI.bind(role, () => { const o = SZ.rt.outdated; role.textContent = o ? '⚠ OLD VERSION — press Ctrl+F5' : SZ.rt.leader ? 'SIM ●' : 'SIM ○ follower'; role.style.background = o ? 'var(--p2)' : ''; role.style.fontWeight = o ? '700' : ''; });
+  UI.bind(role, () => { const o = SZ.rt.outdated; role.textContent = SZ.rt.remote ? 'SIM ◉ live' : o ? '⚠ OLD VERSION — press Ctrl+F5' : SZ.rt.leader ? 'SIM ●' : 'SIM ○ follower'; role.style.background = o ? 'var(--p2)' : ''; role.style.fontWeight = o ? '700' : ''; });
+  // live room (claude.ai artifact): one instructor hosts, everyone else operates the same plant
+  const live = h('button', { class: 'np', title: 'Live room: the instructor hosts the plant; everyone who opens the page follows it and operates it together' });
+  live.style.display = 'none';
+  live.addEventListener('click', () => {
+    const L = SZ.live; if (!L || !L.room) return;
+    if (L.state === 'host') { if (confirm('Stop hosting? Operators drop back to their own plant.')) SZ.roomHost(false); }
+    else if (L.state === 'op') { if (confirm('Leave the live room and practise on your own plant?')) SZ.roomFollow(false); }
+    else if (L.left) SZ.roomFollow(true);
+    else if (L.canHost) { if (confirm('Host this plant live? Everyone who opens the simulator will see your plant and can operate it with you. Failures, sessions and speed stay instructor-only.')) SZ.roomHost(true); }
+    else alert('No instructor is hosting right now. When the instructor presses HOST you join automatically; until then you operate your own plant.');
+  });
+  UI.bind(live, () => {
+    const L = SZ.live; if (!L || !L.room) { live.style.display = 'none'; return; }
+    live.style.display = '';
+    live.textContent = '👥 ' + (L.state === 'host' ? 'HOST · ' + L.n + ' online' : L.state === 'op' ? 'LIVE · following host' : L.left ? 'SOLO · rejoin live' : L.canHost ? 'SOLO · host live' : 'SOLO · ' + L.n + ' online');
+    live.classList.toggle('on', L.state !== 'solo');
+  });
   const clk = h('div', { class: 'clock', title: 'Simulation clock' }); UI.text(clk, (S) => SZ.fmtT(S.t));
   const fr = h('button', { on: { click: () => SZ.cmd({ type: 'freeze', on: !SZ.rt.S.frozen }) } });
   UI.bind(fr, (S) => { fr.textContent = S.frozen ? '▶ RUN' : '❚❚ FREEZE'; fr.classList.toggle('warn', S.frozen); });
@@ -90,7 +107,7 @@ function buildHeader() {
   });
   UI.bind(lvl, (S) => { const hard = S.level === 'hard'; lvl.textContent = hard ? '◆ HARD' : '◇ EASY'; lvl.classList.toggle('on', hard); });
   ses.classList.add('np'); lvl.classList.add('np');   // not shown in pop-out windows
-  r1.append(ses, lvl, role, clk, fr, sp, ab, ack, sil, snd);
+  r1.append(ses, lvl, live, role, clk, fr, sp, ab, ack, sil, snd);
   const nav = h('nav', { class: 'pages' });
   UI.PAGES.forEach(([id, label], i) => {
     const l = h('a', { href: UI.href(id), title: label + ' (Alt+' + ((i + 1) % 10) + ')' }, label);
@@ -693,6 +710,7 @@ UI.alertUpdate = function (S) {
    10 min; if a newer version has been published, a banner offers to reload. Browsers that support it
    show an INSTALL APP button so the simulator gets its own window and desktop icon.              */
 UI.appInit = function () {
+  if (window.claude && typeof window.claude.use === 'function') return;   // inside claude.ai: no service worker, no update check
   if (window.SZ_SINGLE) {                                       // single-file offline copy: just tell the user if a newer one is online
     setTimeout(async () => {
       try {

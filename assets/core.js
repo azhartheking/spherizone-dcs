@@ -383,7 +383,7 @@ function becomeLeader() {
   rt.S = S; rt.last = Date.now(); saveState();
 }
 // code version: a tab running newer simulator code always takes over from a tab with older code
-SZ.CODE_VER = 162;
+SZ.CODE_VER = 163;
 function heartbeat() { lsSet(LKEY, JSON.stringify({ id: rt.id, ts: Date.now(), ver: SZ.CODE_VER })); }
 function drainQueue() {
   const q = parse(lsGet(QKEY)); if (!q || !q.length) return; lsSet(QKEY, '[]');
@@ -408,11 +408,13 @@ function runCmd0(c, S) {
   SZ.exec(S, c);
 }
 SZ.cmd = function (c) {
+  if (rt.remote) { roomSend(c); return; }
   if (rt.leader || !rt.ls) { runCmd(c); saveState(); SZ.render(); }
   else { const q = parse(lsGet(QKEY)) || []; q.push(c); lsSet(QKEY, JSON.stringify(q)); }
 };
 function tick() {
   const now = Date.now();
+  if (rt.remote) { if (now - LR.lastRx > 15000) roomLeave('host lost'); rt.last = now; SZ.render(); return; }
   if (!rt.leader) {
     const L = parse(lsGet(LKEY));
     rt.outdated = !!(L && (L.ver || 0) > SZ.CODE_VER);   // another tab runs newer code → this one should be reloaded
@@ -437,6 +439,7 @@ function tick() {
 SZ.render = function () { for (const f of rt.listeners) { try { f(rt.S); } catch (e) { console.error(e); } } };
 SZ.onRender = (f) => rt.listeners.push(f);
 SZ.start = function () {
+  try { if (G.claude && typeof G.claude.use === 'function') G.claude.use('room').then(r => { if (r) roomInit(r); }).catch(() => { }); } catch (e) { }
   becomeLeaderOrFollow();
   setInterval(tick, 250);
   window.addEventListener('pagehide', () => { if (rt.leader) { saveState(); lsSet(LKEY, JSON.stringify({ id: '', ts: 0 })); } });
@@ -447,6 +450,102 @@ function becomeLeaderOrFollow() {
   else { rt.S = loadState() || SZ.initSteady('H-INJ'); }
   if (rt.leader) heartbeat();
   rt.lastBeat = Date.now();
+  SZ.render();
+}
+/* ---------------- 6. LIVE ROOM (multiplayer in a claude.ai artifact) ----------------
+   One HOST (the instructor, Editor or owner) runs the model and broadcasts the plant state about once a
+   second. Everyone else who has the page open becomes an OPERATOR: they see the same plant live and their
+   actions go to the host as commands. Messages are limited to 4 KiB, so the state travels in numbered
+   chunks. Instructor-only commands from operators are refused. The journal records who did what.      */
+const INSTR = new Set(['fail', 'clearFails', 'schedFail', 'sisBypass', 'resetFoul', 'session', 'exercise', 'reinit', 'snapSave', 'snapRestore', 'speed', 'freeze', 'noise', 'level']);
+const LR = SZ.live = { room: null, user: null, state: 'solo', lastRx: 0, hostPeer: null, canHost: false, left: false, names: {}, n: 0, tx: null };
+let rx = { q: -1, parts: [], got: 0, n: 0 }, txSeq = 0, histNext = 0;
+const CH = 1800;   // chars per chunk: ASCII-only JSON, at most doubled when wrapped -> well under 4 KiB
+function slim(S) {
+  const o = Object.assign({}, S); delete o.hist;
+  o.journal = S.journal.slice(0, 30); o.lab = S.lab.slice(0, 8); o.alerts = (S.alerts || []).slice(0, 6);
+  o.ctl = {}; for (const t in S.ctl) { const c = S.ctl[t]; o.ctl[t] = { pv: c.pv, sp: c.sp, op: c.op, mode: c.mode }; }
+  return o;
+}
+function hostTx() {
+  if (!LR.room || LR.state !== 'host' || !rt.S || !rt.leader) return;
+  const j = JSON.stringify(slim(rt.S), (k, v) => typeof v === 'number' ? (isFinite(v) ? +v.toPrecision(5) : 0) : v)
+    .replace(/[^\x00-\x7f]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+  const n = Math.ceil(j.length / CH); txSeq++;
+  for (let i = 0; i < n; i++) LR.room.emit('st', { q: txSeq, i, n, d: j.slice(i * CH, (i + 1) * CH) }).catch(() => { });
+}
+function onState(m) {
+  if (m.sameTab || LR.state === 'host' || LR.left) return;
+  const d = m.data; if (!d || typeof d.d !== 'string' || typeof d.n !== 'number' || d.n > 200) return;
+  if (d.q !== rx.q || m.peer !== rx.peer) rx = { q: d.q, peer: m.peer, parts: [], got: 0, n: d.n };
+  if (rx.parts[d.i] == null) { rx.parts[d.i] = d.d; rx.got++; }
+  if (rx.got < rx.n) return;
+  let S; try { S = JSON.parse(rx.parts.join('')); } catch (e) { return; }
+  rx.got = -1;
+  if (!S || !S.p || !S.ctl) return;
+  LR.hostPeer = m.peer; LR.lastRx = Date.now();
+  if (LR.state !== 'op') { LR.state = 'op'; rt.remote = true; rt.leader = false; LR.hist = { t: [], d: {} }; histNext = 0; }
+  if (LR.hist.t.length && S.t < LR.hist.t[LR.hist.t.length - 1]) { LR.hist = { t: [], d: {} }; histNext = 0; }
+  for (const t in S.ctl) Object.assign(S.ctl[t], { e1: 0, e2: 0 });
+  S.hist = LR.hist; rt.S = S;
+  if (S.t >= histNext) { sampleHist(S); histNext = S.t + 30; }
+  SZ.render();
+}
+async function nameOf(m) {
+  if (!m.by || !LR.user || !LR.user.profiles) return 'operator ' + String(m.peer).slice(0, 4);
+  if (LR.names[m.by]) return LR.names[m.by];
+  try { const ps = await LR.user.profiles([m.by]); LR.names[m.by] = (ps[m.by] && ps[m.by].name) || 'operator'; } catch (e) { LR.names[m.by] = 'operator'; }
+  return LR.names[m.by];
+}
+async function onCmd(m) {
+  if (LR.state !== 'host' || m.sameTab) return;
+  const c = m.data; if (!c || typeof c !== 'object' || typeof c.type !== 'string') return;
+  const who = await nameOf(m);
+  const S = rt.S; if (!S) return;
+  if (INSTR.has(c.type) && !m.isMe) { SZ.log(S, 'OPERATOR ' + who, 'Instructor-only command refused: ' + c.type); return; }
+  const cc = Object.assign({}, c, { src: 'OPERATOR ' + who }); delete cc.level;
+  runCmd(cc); saveState(); SZ.render();
+}
+function roomSend(c) {
+  if (!LR.room) return;
+  const cc = {}; for (const k in c) if (k !== 'src') cc[k] = c[k];
+  LR.room.emit('cmd', cc).catch(() => { });
+  if (c.type === 'ack' || c.type === 'alertClose') { if (c.type === 'ack') SZ.ackAlarm(rt.S, c.id || 'ALL'); else for (const a of (rt.S.alerts || [])) if (c.id === 'ALL' || a.id === c.id) a.closed = true; SZ.render(); }
+}
+function roomLeave(why) {
+  if (LR.state !== 'op') return;
+  LR.state = 'solo'; rt.remote = false; rt.leader = false;
+  const L = parse(lsGet(LKEY)); if (!rt.ls || !L || Date.now() - L.ts > 1500) becomeLeader(); else rt.S = loadState() || SZ.initSteady('H-INJ');
+  SZ.render();
+}
+SZ.roomHost = function (on) {
+  if (!LR.room) return;
+  if (on) {
+    if (LR.state === 'op') roomLeave('hosting');
+    LR.left = false; LR.state = 'host'; try { sessionStorage.setItem('szsim.host', '1'); } catch (e) { }
+    LR.room.presence({ role: 'host' }).catch(() => { });
+    if (!LR.tx) LR.tx = setInterval(hostTx, 1000);
+    if (rt.S) SZ.log(rt.S, 'INSTRUCTOR', 'Live room: this window is now the HOST — everyone else who opens the simulator follows this plant');
+  } else {
+    LR.state = 'solo'; try { sessionStorage.removeItem('szsim.host'); } catch (e) { }
+    LR.room.presence({ role: null }).catch(() => { });
+    if (LR.tx) { clearInterval(LR.tx); LR.tx = null; }
+  }
+  SZ.render();
+};
+SZ.roomFollow = function (on) {
+  LR.left = !on;
+  if (!on) roomLeave('left'); else LR.lastRx = Date.now();
+  SZ.render();
+};
+async function roomInit(r) {
+  LR.room = r;
+  r.on('st', onState);
+  r.on('cmd', onCmd);
+  r.onPeers((ch) => { LR.n = ch.peers.length; SZ.render(); });
+  try { LR.user = await G.claude.use('user'); LR.canHost = !!(LR.user && LR.user.canEdit && LR.user.canEdit()); } catch (e) { LR.canHost = false; }
+  let wasHost = null; try { wasHost = sessionStorage.getItem('szsim.host'); } catch (e) { }
+  if (wasHost && LR.canHost) SZ.roomHost(true);
   SZ.render();
 }
 })(window);
